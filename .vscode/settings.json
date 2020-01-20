@@ -11,5 +11,6 @@
     "**/.project": true,
     "**/.settings": true,
     "**/.factorypath": true
-  }
+  },
+  "python.pythonPath": "C:\\Users\\Kohler\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
 }
