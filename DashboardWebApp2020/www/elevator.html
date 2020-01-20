@@ -50,9 +50,13 @@
                     scales: {
                         yAxes: [{
                             ticks: {
-                                beginAtZero:true,
+                                beginAtZero:false,
                                 fontSize: 100
                             }
+                        }],
+                        xAxes: [{
+                            beginAtZero: false,
+                            type: 'linear'
                         }]
                     },
                     legend: {
@@ -75,7 +79,7 @@
                     {
                         label: "Elevator Position",
                         fill: false,
-                        lineTension: 0.1,
+                        lineTension: 0.5,
                         backgroundColor: "rgba(75,192,192,0.4)",
                         borderColor: "rgba(75,192,192,1)",
                         borderCapStyle: 'butt',
@@ -99,12 +103,14 @@
 
             renderChart(chartConfig);
 
+            var now = new Date();
+
             NetworkTables.addKeyListener("elevator_pos", function(key, value, isNew) {
                 if (chartConfig.datasets[0].data.length > 1000) {
                     chartConfig.datasets[0].data.shift();
                 }
 
-                chartConfig.datasets[0].data.push(value);
+                chartConfig.datasets[0].data.push({"x": now.getTime(), "y": value});
                 renderChart(chartConfig);
             }, true);
             
