@@ -55,7 +55,8 @@ public class DriveSubsystem extends SubsystemBase {
     private final PIDController turnController = new PIDController(
         SmartDashboard.getNumber("DrivetrainP", DriveConstants.P), 
         SmartDashboard.getNumber("DrivetrainI", DriveConstants.I), 
-        SmartDashboard.getNumber("DrivetrainD", DriveConstants.D));
+        SmartDashboard.getNumber("DrivetrainD", DriveConstants.D)
+    );
 
     public boolean autoAim = false;
     private double limelightAngle = 0;

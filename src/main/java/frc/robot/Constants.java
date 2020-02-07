@@ -76,5 +76,8 @@ public final class Constants {
 
   }
 
+  public static final class IntakeConstants {
+    public static int kMotorPort = 0;//TODO: get actual motor port
+  }
 
 }
