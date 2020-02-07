@@ -44,11 +44,11 @@ public class DriveSubsystem extends SubsystemBase {
     private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
     // The drive encoders
-    // private final CANEncoder m_leftEncoder = new CANEncoder(leftMotor1);
-    // private final CANEncoder m_rightEncoder = new CANEncoder(rightMotor1);
+    private final CANEncoder m_leftEncoder = new CANEncoder(leftMotor1);
+    private final CANEncoder m_rightEncoder = new CANEncoder(rightMotor1);
 
-    private final Encoder m_leftEncoder = new Encoder(DriveConstants.kLeftEncoderPorts[0], DriveConstants.kLeftEncoderPorts[1]);
-    private final Encoder m_rightEncoder = new Encoder(DriveConstants.kRightEncoderPorts[0], DriveConstants.kRightEncoderPorts[1]);
+    // private final Encoder m_leftEncoder = new Encoder(DriveConstants.kLeftEncoderPorts[0], DriveConstants.kLeftEncoderPorts[1]);
+    // private final Encoder m_rightEncoder = new Encoder(DriveConstants.kRightEncoderPorts[0], DriveConstants.kRightEncoderPorts[1]);
 
     private final AHRS navx = new AHRS(SerialPort.Port.kUSB);
 
@@ -66,11 +66,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     public DriveSubsystem() {
         // Sets the distance per pulse for the encoders
-        // m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
-        // m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
+        m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
+        m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
 
-        m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
-        m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
+        // m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
+        // m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
 
         SmartDashboard.putNumber("DrivetrainP", DriveConstants.P);
         SmartDashboard.putNumber("DrivetrainI", DriveConstants.I);
