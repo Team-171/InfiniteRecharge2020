@@ -17,21 +17,63 @@ package frc.robot;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final int kLeftMotor1Port = 2;
-    public static final int kLeftMotor2Port = 3;
-    public static final int kRightMotor1Port = 4;
-    public static final int kRightMotor2Port = 5;
+    public static final int kLeftMotor1Port = 1;
+    public static final int kLeftMotor2Port = 2;
+    public static final int kRightMotor1Port = 3;
+    public static final int kRightMotor2Port = 4;
+
+    public static final double P = 0.001;
+    public static final double I = 0;
+    public static final double D = 0;
 
     public static final int[] kLeftEncoderPorts = new int[]{0, 1};
     public static final int[] kRightEncoderPorts = new int[]{2, 3};
     public static final boolean kLeftEncoderReversed = false;
     public static final boolean kRightEncoderReversed = true;
 
-    public static final int kEncoderCPR = 8192;  // New REV Robotics hex shaft encoders
+    public static final int kEncoderCPR = 1000;  // NEOs (42), but may use REV Robotics hex shaft encoders (8192 counts per revolution)
     public static final double kWheelDiameterInches = 6;
-    public static final double kEncoderDistancePerPulse =
+    public static final double kEncoderDistancePerRotation =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
+        (kWheelDiameterInches * Math.PI);
+  }
+
+  public static final class ElevatorConstants {
+    public static final int kElevatorMotorPort1 = 6;
+    public static final int kElevatorMotorPort2 = 7;
+
+    // TODO: Get real position multiplier
+    public static final double kPositionMultipier = 10;
+
+    public static double speedMultiplier = 1.0;
+
+    public static double kP = 1.0;
+    public static double kI = 0.0;
+    public static double kD = 0.0;
+
+    // TODO: Get real climb height values
+    public static double kHomePosition = 0.0;
+    public static double kClimbPosition = 100.0; 
+    public static double kCarryPosition = 10.0;
+
+    //TODO: Get real min and max elevator heights
+    public static double minHeight = 0.0;
+    public static double maxHeight = 100.0;
+  }
+
+  public static final class OIConstants {
+    public static final int kDriverControllerPort = 0;
+  }
+
+  public static final class ShooterConstants {
+    public static final int kTopMotorPort = 2;
+    public static final int kBottomMotorPort = 1;
+
+    public static double kP = .0001;
+    public static double kI = 0.0;
+    public static double kD = 0.0;
+    public static double kFF = 1.0 / 5874.0;
+
   }
 
 
