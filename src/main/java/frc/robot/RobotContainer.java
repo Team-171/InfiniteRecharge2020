@@ -26,8 +26,9 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.StartShooter;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+// import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.ShintakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -47,9 +48,11 @@ public class RobotContainer {
     private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
     private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+    private final ShintakeSubsystem m_shintakeSubsystem = new ShintakeSubsystem();
 
     // The driver's controller
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+    XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
     /**
      * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -63,7 +66,25 @@ public class RobotContainer {
             // hand, and turning controlled by the right.
             new RunCommand(() -> m_driveSubsystem
                 .arcadeDrive(-m_driverController.getY(GenericHID.Hand.kLeft),
-                    m_driverController.getX(GenericHID.Hand.kRight)), m_driveSubsystem));
+                    m_driverController.getX(GenericHID.Hand.kRight)
+                ), m_driveSubsystem
+            )
+        );
+
+        m_shintakeSubsystem.setDefaultCommand(
+            new RunCommand(() -> m_shintakeSubsystem
+                .drive(m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger) 
+                    - m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)
+                ), m_shintakeSubsystem
+            )
+        );
+
+        m_elevatorSubsystem.setDefaultCommand(
+            new RunCommand(() -> m_elevatorSubsystem
+                .moveManual(getOutput(0.25, 1, m_operatorController.getRawAxis(OIConstants.kOperatorLeftJoystick))
+                ), m_elevatorSubsystem
+            )
+        );
     }
 
     /**
@@ -74,7 +95,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
 
-        new JoystickButton(m_driverController, 2).whileActiveOnce(new StartShooter(m_shooterSubsystem), true);
+        new JoystickButton(m_operatorController, 2).whileActiveOnce(new StartShooter(m_shooterSubsystem), true);
         new JoystickButton(m_driverController, 6).whileActiveContinuous(new AimByLimelight(m_driveSubsystem), true);
         
     }
@@ -139,5 +160,15 @@ public class RobotContainer {
         // // Run path following command, then stop at the end.
         // return ramseteCommand.andThen(() -> m_robotDrive.tankDriveVolts(0, 0));
     // }
+    public static double getOutput(double deadband, double maxOutput, double axis) {
+		double output;
+		if (Math.abs(axis) < deadband) {
+			output = 0;
+		} else {
+			double motorOutput = (((Math.abs(axis) - deadband) / (1 - deadband)) * (axis / Math.abs(axis)));
+			output = motorOutput * maxOutput;
+		}
+		return output;
+	}
 }
 

@@ -7,7 +7,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -21,6 +24,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+//   private Talon m = new Talon(8);
+  private Servo s = new Servo(7);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -42,10 +47,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    //   m.set(0.5);
+      s.set(0.5);
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+    // SmartDashboard.putNumber("key", s.get());
+
     CommandScheduler.getInstance().run();
   }
 

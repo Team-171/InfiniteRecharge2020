@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANEncoder;
@@ -23,23 +24,27 @@ public class ElevatorSubsystem extends SubsystemBase {
    * Creates a new ExampleSubsystem.
    */
 
-  private final CANSparkMax elevatorMotor1 = new CANSparkMax(ElevatorConstants.kElevatorMotorPort1, MotorType.kBrushless);
-  private final CANSparkMax elevatorMotor2= new CANSparkMax(ElevatorConstants.kElevatorMotorPort2, MotorType.kBrushless);
+  private CANSparkMax elevatorMotor1 = new CANSparkMax(ElevatorConstants.kElevatorLeftMotor, MotorType.kBrushless);
+  private CANSparkMax elevatorMotor2 = new CANSparkMax(ElevatorConstants.kElevatorRightMotor, MotorType.kBrushless);
 
   private final CANEncoder m_motor1Encoder = new CANEncoder(elevatorMotor1);
   private final CANEncoder m_motor2Encoder = new CANEncoder(elevatorMotor2);
 
-  private final SpeedControllerGroup elevatorMotors = new SpeedControllerGroup(elevatorMotor1, elevatorMotor2);
+//   private final SpeedControllerGroup elevatorMotors;
 
   private static PIDController kElevatorPIDController = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
 
-  private static boolean pidEnabled = true;
+  private static boolean pidEnabled = false;
   private static double setpoint = 0.0;
 
   public ElevatorSubsystem() {
-    if (pidEnabled) {
-      elevatorMotors.set(kElevatorPIDController.calculate(getAvgEncoderPos(), setpoint));
-    }
+      elevatorMotor1.setInverted(true);
+      
+    //   elevatorMotors = new SpeedControllerGroup(elevatorMotor1, elevatorMotor2);
+
+      if (pidEnabled) {
+        // elevatorMotors.set(kElevatorPIDController.calculate(getAvgEncoderPos(), setpoint));
+      }
   }
 
   @Override
@@ -49,10 +54,11 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void moveManual(double speed) {
-    if (inLimits(speed)) {
-      elevatorMotors.set(speed * ElevatorConstants.speedMultiplier);
-    }
-
+    // if (inLimits(speed)) {
+    //   elevatorMotors.set(speed * ElevatorConstants.speedMultiplier);
+    // }
+        elevatorMotor1.set(speed);
+        elevatorMotor2.set(speed);
   }
 
   public boolean inLimits(double speed) {
@@ -70,8 +76,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     return false;
   }
 
-  public void setPos(double climbHieght) {
-    setpoint = climbHieght;
+  public void setPos(double climbHeight) {
+    setpoint = climbHeight;
   }
 
   private double getAvgEncoderPos() {

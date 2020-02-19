@@ -7,18 +7,57 @@
 
 package frc.robot.subsystems.shooter;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ShintakeConstants;
 
 public class ShintakeSubsystem extends SubsystemBase {
-  /**
-   * Creates a new ShintakeSubsystem.
-   */
+
+  private boolean allowBall = true;
+  private CANSparkMax topMotor = new CANSparkMax(ShintakeConstants.kUpperMotorPort, MotorType.kBrushless);
+  private CANSparkMax bottomMotor = new CANSparkMax(ShintakeConstants.kLowerMotorPort, MotorType.kBrushless);
+  private AnalogInput topProxSwitch = new AnalogInput(ShintakeConstants.kTopProxSwitch);
+  private AnalogInput bottomProxSwitch = new AnalogInput(ShintakeConstants.kBottomProxSwitch);
+
   public ShintakeSubsystem() {
 
   }
 
+  public void drive(double speed)
+  {
+      if(speed > 0)
+      {
+          topMotor.set(speed);
+
+          if(allowBall)
+          {
+              bottomMotor.set(speed);
+          }
+      }
+      else
+      {
+          topMotor.set(speed);
+          bottomMotor.set(speed);
+      }
+  }
+
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    //   if(bottomProxSwitch.get && allowBall)
+    //   {
+    //       allowBall = false;
+    //   }
+
+    //   if(topProxSwitch.get() && !allowBall)
+    //   {
+    //       allowBall = true;
+    //   }
+
+      SmartDashboard.putNumber("TopShintake", topProxSwitch.getVoltage());
   }
 }

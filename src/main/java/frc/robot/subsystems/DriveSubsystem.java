@@ -93,8 +93,8 @@ public class DriveSubsystem extends SubsystemBase {
             calculatePID();
         }
 
-        m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getDistance(),
-                      m_rightEncoder.getDistance());
+        m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getPosition(),
+                      m_rightEncoder.getPosition());
     }
 
         /**
@@ -104,7 +104,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @param rot the commanded rotation
      */
     public void arcadeDrive(double fwd, double rot) {
-        m_drive.arcadeDrive(fwd, rot);
+        m_drive.arcadeDrive(fwd * DriveConstants.kSpeedMultiplier, rot * DriveConstants.kSpeedMultiplier);
     }
 
     /**

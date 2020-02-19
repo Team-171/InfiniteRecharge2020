@@ -7,8 +7,8 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+// import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -33,8 +33,8 @@ public class StartShooter extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-      double bRPM = SmartDashboard.getNumber("SetBottomRPM", 0);
-      double tRPM = SmartDashboard.getNumber("SetTopRPM", 0);
+      double bRPM = -4000;// SmartDashboard.getNumber("SetBottomRPM", 0);
+      double tRPM = -5000;//SmartDashboard.getNumber("SetTopRPM", 0);
 
       m_subsystem.pidEnabled = true;
       m_subsystem.setRPM(bRPM, tRPM);

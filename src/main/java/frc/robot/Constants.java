@@ -22,6 +22,8 @@ public final class Constants {
     public static final int kRightMotor1Port = 3;
     public static final int kRightMotor2Port = 4;
 
+    public static final double kSpeedMultiplier = 1.0;
+
     public static final double P = 0.001;
     public static final double I = 0;
     public static final double D = 0;
@@ -39,13 +41,13 @@ public final class Constants {
   }
 
   public static final class ElevatorConstants {
-    public static final int kElevatorMotorPort1 = 6;
-    public static final int kElevatorMotorPort2 = 7;
+    public static final int kElevatorLeftMotor = 5;
+    public static final int kElevatorRightMotor = 6;
 
     // TODO: Get real position multiplier
     public static final double kPositionMultipier = 10;
 
-    public static double speedMultiplier = 1.0;
+    public static double speedMultiplier = 0.5;
 
     public static double kP = 1.0;
     public static double kI = 0.0;
@@ -63,17 +65,30 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+
+    public static final int kOperatorControllerPort = 1;
+    public static final int kOperatorLeftTrigger = 2;
+    public static final int kOperatorRightTrigger = 3;
+    public static final int kOperatorLeftJoystick = 1;
   }
 
   public static final class ShooterConstants {
-    public static final int kTopMotorPort = 2;
-    public static final int kBottomMotorPort = 1;
+    public static final int kTopMotorPort = 9;
+    public static final int kBottomMotorPort = 10;
 
     public static double kP = .0001;
     public static double kI = 0.0;
     public static double kD = 0.0;
     public static double kFF = 1.0 / 5874.0;
 
+  }
+
+  public static final class ShintakeConstants {
+    public static final int kUpperMotorPort = 7;
+    public static final int kLowerMotorPort = 8;
+
+    public static final int kTopProxSwitch = 0;
+    public static final int kBottomProxSwitch = 1;
   }
 
   public static final class IntakeConstants {
