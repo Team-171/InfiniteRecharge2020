@@ -8,6 +8,8 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,9 +35,14 @@ public class ShooterSubsystem extends SubsystemBase {
   private static double kRpmBottom = 0;
   private static double kRpmTop = 0;
 
+  private DoubleSolenoid shooterSolenoid = new DoubleSolenoid(0, 1);
+
   public boolean pidEnabled = false;
 
   public ShooterSubsystem() {
+
+    shooterSolenoid.set(DoubleSolenoid.Value.kForward);
+
     SmartDashboard.putNumber("SetBottomRPM", 0);
     SmartDashboard.putNumber("SetTopRPM", 0);
   }
@@ -58,6 +65,11 @@ public class ShooterSubsystem extends SubsystemBase {
   public void setManual(double bottomValue, double topValue) {
     bottomMotor.set(bottomValue);
     topMotor.set(topValue);
+  }
+
+  public void toggleShooterAngle(boolean up)
+  {
+      shooterSolenoid.set(up ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
   }
 
   public void calculatePID() {

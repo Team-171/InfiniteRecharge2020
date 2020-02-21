@@ -65,6 +65,16 @@ public class DriveSubsystem extends SubsystemBase {
     private final DifferentialDriveOdometry m_odometry;
 
     public DriveSubsystem() {
+        leftMotor1.restoreFactoryDefaults();
+        leftMotor2.restoreFactoryDefaults();
+        rightMotor1.restoreFactoryDefaults();
+        rightMotor2.restoreFactoryDefaults();
+
+        leftMotor1.setOpenLoopRampRate(0.25);
+        leftMotor2.setOpenLoopRampRate(0.25);
+        rightMotor1.setOpenLoopRampRate(0.25);
+        rightMotor2.setOpenLoopRampRate(0.25);
+
         // Sets the distance per pulse for the encoders
         m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
         m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);

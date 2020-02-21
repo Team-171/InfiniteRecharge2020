@@ -98,14 +98,31 @@ public class RobotContainer {
         new JoystickButton(m_operatorController, 2).whileActiveOnce(new StartShooter(m_shooterSubsystem), true);
         new JoystickButton(m_driverController, 6).whileActiveContinuous(new AimByLimelight(m_driveSubsystem), true);
         
-        new JoystickButton(m_operatorController, 1).whenPressed(
+        new JoystickButton(m_operatorController, 3).whenPressed(
             new RunCommand(() -> {
                     m_elevatorSubsystem.resetPosition();
                 }, m_elevatorSubsystem
             )
         );
+
+        new JoystickButton(m_operatorController, 4).whenPressed(
+            new RunCommand(() -> {
+                    m_shooterSubsystem.toggleShooterAngle(true);
+                }, m_shooterSubsystem
+            )
+        );
+
+        new JoystickButton(m_operatorController, 1).whenPressed(
+            new RunCommand(() -> {
+                    m_shooterSubsystem.toggleShooterAngle(false);
+                }, m_shooterSubsystem
+            )
+        );
     }
 
+    public void teleopInit(){
+        m_shooterSubsystem.toggleShooterAngle(false);
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
