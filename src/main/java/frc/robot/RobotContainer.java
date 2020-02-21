@@ -98,6 +98,12 @@ public class RobotContainer {
         new JoystickButton(m_operatorController, 2).whileActiveOnce(new StartShooter(m_shooterSubsystem), true);
         new JoystickButton(m_driverController, 6).whileActiveContinuous(new AimByLimelight(m_driveSubsystem), true);
         
+        new JoystickButton(m_operatorController, 1).whenPressed(
+            new RunCommand(() -> {
+                    m_elevatorSubsystem.resetPosition();
+                }, m_elevatorSubsystem
+            )
+        );
     }
 
 

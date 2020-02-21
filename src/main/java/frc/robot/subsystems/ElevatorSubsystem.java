@@ -38,7 +38,15 @@ public class ElevatorSubsystem extends SubsystemBase {
   private static double setpoint = 0.0;
 
   public ElevatorSubsystem() {
-      elevatorMotor1.setInverted(true);
+      elevatorMotor1.restoreFactoryDefaults();
+      elevatorMotor2.restoreFactoryDefaults();
+
+      elevatorMotor2.setInverted(true);
+      // elevatorMotor2.setInverted(true);
+
+      elevatorMotor1.setOpenLoopRampRate(0.5);
+      elevatorMotor2.setOpenLoopRampRate(0.5);
+
       
     //   elevatorMotors = new SpeedControllerGroup(elevatorMotor1, elevatorMotor2);
 
@@ -51,6 +59,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
+    SmartDashboard.putNumber("Elevator Height", getAvgEncoderPos());
   }
 
   public void moveManual(double speed) {
@@ -82,6 +91,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private double getAvgEncoderPos() {
     return (m_motor1Encoder.getPosition() + m_motor2Encoder.getPosition()) / 2.0;
+  }
+
+  public void resetPosition()
+  {
+      m_motor1Encoder.setPosition(0);
+      m_motor2Encoder.setPosition(0);
   }
 
 }
