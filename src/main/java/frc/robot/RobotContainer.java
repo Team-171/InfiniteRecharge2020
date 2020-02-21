@@ -28,6 +28,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 // import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem.ShooterAngle;
 import frc.robot.subsystems.shooter.ShintakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
@@ -81,7 +82,8 @@ public class RobotContainer {
 
         m_elevatorSubsystem.setDefaultCommand(
             new RunCommand(() -> m_elevatorSubsystem
-                .moveManual(getOutput(0.25, 1, m_operatorController.getRawAxis(OIConstants.kOperatorLeftJoystick))
+                .moveElevator(
+                    -getOutput(0.25, 1, m_operatorController.getRawAxis(OIConstants.kOperatorLeftJoystick))
                 ), m_elevatorSubsystem
             )
         );
@@ -107,21 +109,23 @@ public class RobotContainer {
 
         new JoystickButton(m_operatorController, 4).whenPressed(
             new RunCommand(() -> {
-                    m_shooterSubsystem.toggleShooterAngle(true);
+                    m_shooterSubsystem.toggleShooterAngle(ShooterAngle.UP);
                 }, m_shooterSubsystem
             )
         );
 
         new JoystickButton(m_operatorController, 1).whenPressed(
             new RunCommand(() -> {
-                    m_shooterSubsystem.toggleShooterAngle(false);
+                    m_shooterSubsystem.toggleShooterAngle(ShooterAngle.DOWN);
                 }, m_shooterSubsystem
             )
         );
     }
 
     public void teleopInit(){
-        m_shooterSubsystem.toggleShooterAngle(false);
+        m_shooterSubsystem.toggleShooterAngle(ShooterAngle.DOWN);
+        m_elevatorSubsystem.resetPosition();
+        // m_elevatorSubsystem.setPos(ElevatorConstants.kHomePosition);
     }
 
     /**

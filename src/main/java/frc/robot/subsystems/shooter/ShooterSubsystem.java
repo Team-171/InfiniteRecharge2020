@@ -23,74 +23,88 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-  private final CANSparkMax bottomMotor = new CANSparkMax(ShooterConstants.kBottomMotorPort, MotorType.kBrushless);
-  private final CANSparkMax topMotor = new CANSparkMax(ShooterConstants.kTopMotorPort, MotorType.kBrushless);
-
-  private final CANEncoder bottomEncoder = new CANEncoder(bottomMotor);
-  private final CANEncoder topEncoder = new CANEncoder(topMotor);
-  
-  private PIDController kShooterPIDControllerBottom = new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD);
-  private PIDController kShooterPIDControllerTop = new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD);
-
-  private static double kRpmBottom = 0;
-  private static double kRpmTop = 0;
-
-  private DoubleSolenoid shooterSolenoid = new DoubleSolenoid(0, 1);
-
-  public boolean pidEnabled = false;
-
-  public ShooterSubsystem() {
-
-    shooterSolenoid.set(DoubleSolenoid.Value.kForward);
-
-    SmartDashboard.putNumber("SetBottomRPM", 0);
-    SmartDashboard.putNumber("SetTopRPM", 0);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    updateSmartdashboard();
-
-    if (pidEnabled) {
-      calculatePID();
+    public enum ShooterAngle {
+        UP, DOWN
     }
-  }
 
-  public void setRPM(double rpmBottom, double rpmTop) {
-    kRpmBottom = rpmBottom;
-    kRpmTop = rpmTop;
-  }
+    private final CANSparkMax bottomMotor = new CANSparkMax(ShooterConstants.kBottomMotorPort, MotorType.kBrushless);
+    private final CANSparkMax topMotor = new CANSparkMax(ShooterConstants.kTopMotorPort, MotorType.kBrushless);
 
-  public void setManual(double bottomValue, double topValue) {
-    bottomMotor.set(bottomValue);
-    topMotor.set(topValue);
-  }
+    private final CANEncoder bottomEncoder = new CANEncoder(bottomMotor);
+    private final CANEncoder topEncoder = new CANEncoder(topMotor);
 
-  public void toggleShooterAngle(boolean up)
-  {
-      shooterSolenoid.set(up ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
-  }
+    private PIDController kShooterPIDControllerBottom = new PIDController(ShooterConstants.kP, ShooterConstants.kI,
+            ShooterConstants.kD);
+    private PIDController kShooterPIDControllerTop = new PIDController(ShooterConstants.kP, ShooterConstants.kI,
+            ShooterConstants.kD);
 
-  public void calculatePID() {
-    double errBottom = kShooterPIDControllerBottom.calculate(bottomEncoder.getVelocity(), kRpmBottom);
-    double errTop = kShooterPIDControllerTop.calculate(topEncoder.getVelocity(), -kRpmTop); // Top runs backwards, so target is negative
+    private static double kRpmBottom = 0;
+    private static double kRpmTop = 0;
 
-    double ffBottom = ShooterConstants.kFF * kRpmBottom;
-    double ffTop = ShooterConstants.kFF * -kRpmTop; // Top runs backwards
+    private DoubleSolenoid shooterSolenoid = new DoubleSolenoid(0, 1);
 
-    bottomMotor.set(errBottom + ffBottom);
-    topMotor.set(errTop + ffTop);
+    public boolean pidEnabled = false;
 
-    SmartDashboard.putNumber("SetValueBottom", ffBottom);
-    SmartDashboard.putNumber("SetValueTop", ffTop);
-  }
+    public ShooterSubsystem() {
 
-  public void updateSmartdashboard() {
-    SmartDashboard.putNumber("BottomRPM", bottomEncoder.getVelocity());
-    SmartDashboard.putNumber("TopRPM", topEncoder.getVelocity());
+        shooterSolenoid.set(DoubleSolenoid.Value.kForward);
 
-    SmartDashboard.putNumber("TargetRPMBottom", kRpmBottom);
-    SmartDashboard.putNumber("TargetRPMTop", kRpmTop);
-  }
+        SmartDashboard.putNumber("SetBottomRPM", 0);
+        SmartDashboard.putNumber("SetTopRPM", 0);
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        updateSmartdashboard();
+
+        if (pidEnabled) {
+            calculatePID();
+        }
+    }
+
+    public void setRPM(double rpmBottom, double rpmTop) {
+        kRpmBottom = rpmBottom;
+        kRpmTop = rpmTop;
+    }
+
+    public void setManual(double bottomValue, double topValue) {
+        bottomMotor.set(bottomValue);
+        topMotor.set(topValue);
+    }
+
+    public void toggleShooterAngle(ShooterAngle angle) {
+        switch (angle) {
+        case UP:
+            shooterSolenoid.set(DoubleSolenoid.Value.kForward);
+            break;
+
+        case DOWN:
+            shooterSolenoid.set(DoubleSolenoid.Value.kReverse);
+            break;
+        }
+    }
+
+    public void calculatePID() {
+        double errBottom = kShooterPIDControllerBottom.calculate(bottomEncoder.getVelocity(), kRpmBottom);
+        double errTop = kShooterPIDControllerTop.calculate(topEncoder.getVelocity(), -kRpmTop); // Top runs backwards,
+                                                                                                // so target is negative
+
+        double ffBottom = ShooterConstants.kFF * kRpmBottom;
+        double ffTop = ShooterConstants.kFF * -kRpmTop; // Top runs backwards
+
+        bottomMotor.set(errBottom + ffBottom);
+        topMotor.set(errTop + ffTop);
+
+        SmartDashboard.putNumber("SetValueBottom", ffBottom);
+        SmartDashboard.putNumber("SetValueTop", ffTop);
+    }
+
+    public void updateSmartdashboard() {
+        SmartDashboard.putNumber("BottomRPM", bottomEncoder.getVelocity());
+        SmartDashboard.putNumber("TopRPM", topEncoder.getVelocity());
+
+        SmartDashboard.putNumber("TargetRPMBottom", kRpmBottom);
+        SmartDashboard.putNumber("TargetRPMTop", kRpmTop);
+    }
 }

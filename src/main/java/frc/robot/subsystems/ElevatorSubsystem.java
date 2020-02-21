@@ -15,88 +15,120 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
-  /**
-   * Creates a new ExampleSubsystem.
-   */
+    /**
+     * Creates a new ExampleSubsystem.
+     */
 
-  private CANSparkMax elevatorMotor1 = new CANSparkMax(ElevatorConstants.kElevatorLeftMotor, MotorType.kBrushless);
-  private CANSparkMax elevatorMotor2 = new CANSparkMax(ElevatorConstants.kElevatorRightMotor, MotorType.kBrushless);
+    private CANSparkMax elevatorMotor1 = new CANSparkMax(ElevatorConstants.kElevatorLeftMotor, MotorType.kBrushless);
+    private CANSparkMax elevatorMotor2 = new CANSparkMax(ElevatorConstants.kElevatorRightMotor, MotorType.kBrushless);
 
-  private final CANEncoder m_motor1Encoder = new CANEncoder(elevatorMotor1);
-  private final CANEncoder m_motor2Encoder = new CANEncoder(elevatorMotor2);
+    private final CANEncoder m_motor1Encoder = new CANEncoder(elevatorMotor1);
+    private final CANEncoder m_motor2Encoder = new CANEncoder(elevatorMotor2);
 
-//   private final SpeedControllerGroup elevatorMotors;
+    // private final SpeedControllerGroup elevatorMotors;
 
-  private static PIDController kElevatorPIDController = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
+    private PIDController kElevatorPIDController = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
 
-  private static boolean pidEnabled = false;
-  private static double setpoint = 0.0;
+    private boolean pidEnabled = false;
+    // private double setpoint = 0.0;
 
-  public ElevatorSubsystem() {
-      elevatorMotor1.restoreFactoryDefaults();
-      elevatorMotor2.restoreFactoryDefaults();
+    private boolean zeroed = false;
+    private boolean overridden = false;
 
-      elevatorMotor2.setInverted(true);
-      // elevatorMotor2.setInverted(true);
+    public ElevatorSubsystem() {
+        elevatorMotor1.restoreFactoryDefaults();
+        elevatorMotor2.restoreFactoryDefaults();
 
-      elevatorMotor1.setOpenLoopRampRate(0.5);
-      elevatorMotor2.setOpenLoopRampRate(0.5);
+        elevatorMotor1.setInverted(true);
+        // elevatorMotor2.setInverted(true);
 
-      
-    //   elevatorMotors = new SpeedControllerGroup(elevatorMotor1, elevatorMotor2);
+        elevatorMotor1.setOpenLoopRampRate(0.5);
+        // elevatorMotor2.setOpenLoopRampRate(0.5);
 
-      if (pidEnabled) {
-        // elevatorMotors.set(kElevatorPIDController.calculate(getAvgEncoderPos(), setpoint));
-      }
-  }
+        elevatorMotor2.follow(elevatorMotor1, true);
+       
+        kElevatorPIDController.setSetpoint(0);
+        kElevatorPIDController.setTolerance(0.1);
+        kElevatorPIDController.setIntegratorRange(-0.1, 0.1);
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-
-    SmartDashboard.putNumber("Elevator Height", getAvgEncoderPos());
-  }
-
-  public void moveManual(double speed) {
-    // if (inLimits(speed)) {
-    //   elevatorMotors.set(speed * ElevatorConstants.speedMultiplier);
-    // }
-        elevatorMotor1.set(speed);
-        elevatorMotor2.set(speed);
-  }
-
-  public boolean inLimits(double speed) {
-    //TODO: Add velocity check to elevator limit calculation
-    if (speed >= 0) {
-      if (getAvgEncoderPos() < ElevatorConstants.maxHeight) {
-        return true;
-      }
-    } else {
-      if (getAvgEncoderPos() > ElevatorConstants.minHeight) {
-        return true;
-      }
+        SmartDashboard.putNumber("Elevator I", 0);
     }
 
-    return false;
-  }
+    @Override
+    public void periodic() {
+        kElevatorPIDController.setI(SmartDashboard.getNumber("Elevator I", 0));
 
-  public void setPos(double climbHeight) {
-    setpoint = climbHeight;
-  }
+        if(!overridden)
+        {
+            moveManual(kElevatorPIDController.calculate(getAvgEncoderPos()));
+        }
 
-  private double getAvgEncoderPos() {
-    return (m_motor1Encoder.getPosition() + m_motor2Encoder.getPosition()) / 2.0;
-  }
+        SmartDashboard.putNumber("Elevator Height", getAvgEncoderPos());
+        SmartDashboard.putNumber("Elevator Speed", elevatorMotor1.get());
+    }
 
-  public void resetPosition()
-  {
-      m_motor1Encoder.setPosition(0);
-      m_motor2Encoder.setPosition(0);
-  }
+    public void moveElevator(double speed) {
+        if(speed != 0)
+        {
+            overridden = true;
+            moveManual(speed);
+        }
+        else
+        {
+            if(overridden)
+            {
+                kElevatorPIDController.setSetpoint(getAvgEncoderPos());//when the controller is let off the PID loop tries to keep the current height
+            }
+            overridden = false;
+        }
+    }
+
+    private void moveManual(double speed) {
+        if (inLimits(speed)) {
+            elevatorMotor1.set(speed * (speed > 0 ? ElevatorConstants.forwardSpeedMultiplier : ElevatorConstants.reverseSpeedMultiplier));
+        }
+        else
+        {
+            elevatorMotor1.set(0);
+        }
+    }
+
+    public boolean inLimits(double speed) {
+        // TODO: Add velocity check to elevator limit calculation
+        if (speed >= 0) {
+            if (getAvgEncoderPos() < ElevatorConstants.maxHeight) {
+                return true;
+            }
+        } else {
+            if (getAvgEncoderPos() > ElevatorConstants.minHeight) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void setPos(double climbHeight) {
+        kElevatorPIDController.setSetpoint(climbHeight);
+    }
+
+    private double getAvgEncoderPos() {
+        return (m_motor1Encoder.getPosition() + m_motor2Encoder.getPosition()) / 2.0;
+    }
+
+    public void resetPosition() {
+        if(!zeroed)
+        {
+            m_motor1Encoder.setPosition(0);
+            m_motor2Encoder.setPosition(0);
+            zeroed = true;
+        }
+    }
 
 }

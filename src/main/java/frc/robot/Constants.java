@@ -16,6 +16,13 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public enum DashboardOutput {
+        MATCH,
+        DEBUG
+    }
+
+    public static final DashboardOutput robotLogLevel = DashboardOutput.DEBUG;
+
   public static final class DriveConstants {
     public static final int kLeftMotor1Port = 1;
     public static final int kLeftMotor2Port = 2;
@@ -47,20 +54,21 @@ public final class Constants {
     // TODO: Get real position multiplier
     public static final double kPositionMultipier = 10;
 
-    public static double speedMultiplier = 0.5;
+    public static double forwardSpeedMultiplier = 1.0;
+    public static double reverseSpeedMultiplier = 0.4;
 
-    public static double kP = 1.0;
+    public static double kP = 0.1;
     public static double kI = 0.0;
     public static double kD = 0.0;
 
     // TODO: Get real climb height values
-    public static double kHomePosition = 0.0;
+    public static double kHomePosition = -5.5;
     public static double kClimbPosition = 100.0; 
     public static double kCarryPosition = 10.0;
 
     //TODO: Get real min and max elevator heights
-    public static double minHeight = 0.0;
-    public static double maxHeight = 100.0;
+    public static double minHeight = -6.0;
+    public static double maxHeight = 125.0;
   }
 
   public static final class OIConstants {
