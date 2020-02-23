@@ -38,8 +38,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private PIDController kShooterPIDControllerTop = new PIDController(ShooterConstants.kP, ShooterConstants.kI,
             ShooterConstants.kD);
 
-    private static double kRpmBottom = 0;
-    private static double kRpmTop = 0;
+    private double kRpmBottom = 0;
+    private double kRpmTop = 0;
 
     private DoubleSolenoid shooterSolenoid = new DoubleSolenoid(0, 1);
 
@@ -48,14 +48,25 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
 
         shooterSolenoid.set(DoubleSolenoid.Value.kForward);
+        kShooterPIDControllerBottom.setIntegratorRange(-0.05, 0.05);
+        kShooterPIDControllerTop.setIntegratorRange(-0.05, 0.05);
 
         SmartDashboard.putNumber("SetBottomRPM", 0);
         SmartDashboard.putNumber("SetTopRPM", 0);
+
+        SmartDashboard.putNumber("ShooterP", ShooterConstants.kP);
+        SmartDashboard.putNumber("ShooterI", ShooterConstants.kI);
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        kShooterPIDControllerTop.setP(SmartDashboard.getNumber("ShooterP", 0));
+        kShooterPIDControllerBottom.setP(SmartDashboard.getNumber("ShooterP", 0));
+        
+        kShooterPIDControllerTop.setI(SmartDashboard.getNumber("ShooterI", 0));
+        kShooterPIDControllerBottom.setI(SmartDashboard.getNumber("ShooterI", 0));
+
         updateSmartdashboard();
 
         if (pidEnabled) {

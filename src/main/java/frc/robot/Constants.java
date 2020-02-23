@@ -64,17 +64,23 @@ public final class Constants {
     // TODO: Get real climb height values
     public static double kHomePosition = -5.5;
     public static double kClimbPosition = 100.0; 
-    public static double kCarryPosition = 10.0;
+    public static double kCarryPosition = 90.0;
 
     //TODO: Get real min and max elevator heights
     public static double minHeight = -6.0;
-    public static double maxHeight = 125.0;
+    public static double maxHeight = 150.0;
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kDriverYAxis = 1;
+    public static final int kDriverTurnAxis = 2;
+
+    public static final double kmaxTurnMultiplier = .8;
+    public static final double kminTurnMultiplier = .55;
 
     public static final int kOperatorControllerPort = 1;
+
     public static final int kOperatorLeftTrigger = 2;
     public static final int kOperatorRightTrigger = 3;
     public static final int kOperatorLeftJoystick = 1;
@@ -84,8 +90,8 @@ public final class Constants {
     public static final int kTopMotorPort = 9;
     public static final int kBottomMotorPort = 10;
 
-    public static double kP = .0001;
-    public static double kI = 0.0;
+    public static double kP = .00015;
+    public static double kI = 0.0002;
     public static double kD = 0.0;
     public static double kFF = 1.0 / 5874.0;
 

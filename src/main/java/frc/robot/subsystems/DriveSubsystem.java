@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 
 
@@ -116,6 +117,15 @@ public class DriveSubsystem extends SubsystemBase {
     public void arcadeDrive(double fwd, double rot) {
         m_drive.arcadeDrive(fwd * DriveConstants.kSpeedMultiplier, rot * DriveConstants.kSpeedMultiplier);
     }
+
+    public void driveRobot(double forward, double rotation) {
+        double rightMultiplier = OIConstants.kminTurnMultiplier 
+            + ((1 - Math.abs(forward)) 
+            * (OIConstants.kmaxTurnMultiplier - OIConstants.kminTurnMultiplier));
+
+        SmartDashboard.putNumber("Right Multiplier", rightMultiplier);
+        arcadeDrive(forward, rotation * rightMultiplier);
+	}
 
     /**
      * Resets the drive encoders to currently read a position of 0.
