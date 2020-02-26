@@ -7,21 +7,23 @@
 
 package frc.robot;
 
+import java.util.EnumSet;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants.  This class should not be used for any other purpose.  All constants should be
- * declared globally (i.e. public static).  Do not put anything functional in this class.
+ * The Constants class provides a convenient place for teams to hold robot-wide
+ * numerical or boolean constants. This class should not be used for any other
+ * purpose. All constants should be declared globally (i.e. public static). Do
+ * not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes)
+ * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public enum DashboardOutput {
-        MATCH,
-        DEBUG
-    }
 
-    public static final DashboardOutput robotLogLevel = DashboardOutput.DEBUG;
+    public static final EnumSet<SmartLogger.LogLevel> robotLogLevel = EnumSet.of(SmartLogger.LogLevel.ELEVATOR_TUNING);
 
   public static final class DriveConstants {
     public static final int kLeftMotor1Port = 1;
@@ -30,6 +32,8 @@ public final class Constants {
     public static final int kRightMotor2Port = 4;
 
     public static final double kSpeedMultiplier = 1.0;
+
+    public static final double kRampRate = 0.25;
 
     public static final double P = 0.001;
     public static final double I = 0;
@@ -90,10 +94,15 @@ public final class Constants {
     public static final int kTopMotorPort = 9;
     public static final int kBottomMotorPort = 10;
 
-    public static double kP = .00015;
-    public static double kI = 0.0002;
-    public static double kD = 0.0;
     public static double kFF = 1.0 / 5874.0;
+
+    public static double kPTop = .00015;
+    public static double kITop = 0.001;
+    public static double kDTop = 0.0;
+    
+    public static double kPBottom = .00025;
+    public static double kIBottom = 0.001;
+    public static double kDBottom = 0.0;
 
   }
 

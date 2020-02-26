@@ -71,10 +71,10 @@ public class DriveSubsystem extends SubsystemBase {
         rightMotor1.restoreFactoryDefaults();
         rightMotor2.restoreFactoryDefaults();
 
-        leftMotor1.setOpenLoopRampRate(0.25);
-        leftMotor2.setOpenLoopRampRate(0.25);
-        rightMotor1.setOpenLoopRampRate(0.25);
-        rightMotor2.setOpenLoopRampRate(0.25);
+        leftMotor1.setOpenLoopRampRate(DriveConstants.kRampRate);
+        leftMotor2.setOpenLoopRampRate(DriveConstants.kRampRate);
+        rightMotor1.setOpenLoopRampRate(DriveConstants.kRampRate);
+        rightMotor2.setOpenLoopRampRate(DriveConstants.kRampRate);
 
         // Sets the distance per pulse for the encoders
         m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
@@ -83,9 +83,9 @@ public class DriveSubsystem extends SubsystemBase {
         // m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
         // m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
 
-        SmartDashboard.putNumber("DrivetrainP", DriveConstants.P);
-        SmartDashboard.putNumber("DrivetrainI", DriveConstants.I);
-        SmartDashboard.putNumber("DrivetrainD", DriveConstants.D);
+        // SmartDashboard.putNumber("DrivetrainP", DriveConstants.P);
+        // SmartDashboard.putNumber("DrivetrainI", DriveConstants.I);
+        // SmartDashboard.putNumber("DrivetrainD", DriveConstants.D);
 
         m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
     }
@@ -123,7 +123,7 @@ public class DriveSubsystem extends SubsystemBase {
             + ((1 - Math.abs(forward)) 
             * (OIConstants.kmaxTurnMultiplier - OIConstants.kminTurnMultiplier));
 
-        SmartDashboard.putNumber("Right Multiplier", rightMultiplier);
+        // SmartDashboard.putNumber("Right Multiplier", rightMultiplier);
         arcadeDrive(forward, rotation * rightMultiplier);
 	}
 
@@ -185,9 +185,9 @@ public class DriveSubsystem extends SubsystemBase {
         double err = turnController.calculate(currentHeading, targetHeading);
 
         m_drive.arcadeDrive(0, err);
-        SmartDashboard.putNumber("Current Heading", currentHeading);
-        SmartDashboard.putNumber("Target Heading", targetHeading);
-        SmartDashboard.putNumber("Turn Value", err);
+        // SmartDashboard.putNumber("Current Heading", currentHeading);
+        // SmartDashboard.putNumber("Target Heading", targetHeading);
+        // SmartDashboard.putNumber("Turn Value", err);
     }
 
     public void setTargetAngle(double angle) {

@@ -97,29 +97,43 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
 
-        new JoystickButton(m_operatorController, 2).whileActiveOnce(new StartShooter(m_shooterSubsystem), true);
+        new JoystickButton(m_operatorController, 2)
+            .whileActiveOnce(
+                new RunCommand(() -> {
+                    m_shooterSubsystem.startShooter();
+                }, m_shooterSubsystem
+            ), true)
+            .whenInactive(
+                new RunCommand(() -> {
+                    m_shooterSubsystem.stopShooter();
+                }, m_shooterSubsystem
+            ), true);
+
         new JoystickButton(m_driverController, 6).whileActiveContinuous(new AimByLimelight(m_driveSubsystem), true);
         
-        new JoystickButton(m_operatorController, 3).whenPressed(
-            new RunCommand(() -> {
-                    m_elevatorSubsystem.resetPosition();
-                }, m_elevatorSubsystem
-            )
-        );
+        new JoystickButton(m_operatorController, 3)
+            .whenPressed(
+                new RunCommand(() -> {
+                        m_elevatorSubsystem.resetPosition();
+                    }, m_elevatorSubsystem
+                )
+            );
 
-        new JoystickButton(m_operatorController, 4).whenPressed(
-            new RunCommand(() -> {
-                    m_shooterSubsystem.toggleShooterAngle(ShooterAngle.UP);
-                }, m_shooterSubsystem
-            )
-        );
+        new JoystickButton(m_operatorController, 4)
+            .whenPressed(
+                new RunCommand(() -> {
+                        m_shooterSubsystem.toggleShooterAngle(ShooterAngle.UP);
+                    }, m_shooterSubsystem
+                ),
+            false);
 
-        new JoystickButton(m_operatorController, 1).whenPressed(
-            new RunCommand(() -> {
-                    m_shooterSubsystem.toggleShooterAngle(ShooterAngle.DOWN);
-                }, m_shooterSubsystem
-            )
-        );
+        new JoystickButton(m_operatorController, 1)
+            .whenPressed(
+                new RunCommand(() -> {
+                        m_shooterSubsystem.toggleShooterAngle(ShooterAngle.DOWN);
+                    }, m_shooterSubsystem
+                ),
+            false);
     }
 
     public void teleopInit(){

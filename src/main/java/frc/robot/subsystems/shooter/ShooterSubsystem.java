@@ -13,7 +13,10 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.SmartLogger;
 import frc.robot.Constants.ShooterConstants;
+
+import java.util.EnumSet;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -33,39 +36,64 @@ public class ShooterSubsystem extends SubsystemBase {
     private final CANEncoder bottomEncoder = new CANEncoder(bottomMotor);
     private final CANEncoder topEncoder = new CANEncoder(topMotor);
 
-    private PIDController kShooterPIDControllerBottom = new PIDController(ShooterConstants.kP, ShooterConstants.kI,
-            ShooterConstants.kD);
-    private PIDController kShooterPIDControllerTop = new PIDController(ShooterConstants.kP, ShooterConstants.kI,
-            ShooterConstants.kD);
-
-    private double kRpmBottom = 0;
-    private double kRpmTop = 0;
+    private PIDController kShooterPIDControllerBottom = new PIDController(ShooterConstants.kPTop, ShooterConstants.kITop,
+            ShooterConstants.kDTop);
+    private PIDController kShooterPIDControllerTop = new PIDController(ShooterConstants.kPTop, ShooterConstants.kITop,
+            ShooterConstants.kDTop);
 
     private DoubleSolenoid shooterSolenoid = new DoubleSolenoid(0, 1);
 
     public boolean pidEnabled = false;
 
     public ShooterSubsystem() {
+        topMotor.restoreFactoryDefaults();
+        // topMotor.setOpenLoopRampRate(0.1);
+        
+        bottomMotor.restoreFactoryDefaults();
+        bottomMotor.setInverted(true);
+        // bottomMotor.setOpenLoopRampRate(0.1);
 
         shooterSolenoid.set(DoubleSolenoid.Value.kForward);
-        kShooterPIDControllerBottom.setIntegratorRange(-0.05, 0.05);
-        kShooterPIDControllerTop.setIntegratorRange(-0.05, 0.05);
-
-        SmartDashboard.putNumber("SetBottomRPM", 0);
-        SmartDashboard.putNumber("SetTopRPM", 0);
-
-        SmartDashboard.putNumber("ShooterP", ShooterConstants.kP);
-        SmartDashboard.putNumber("ShooterI", ShooterConstants.kI);
+        kShooterPIDControllerBottom.setIntegratorRange(-0.08, 0.08);
+        kShooterPIDControllerTop.setIntegratorRange(-0.08, 0.08);
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        kShooterPIDControllerTop.setP(SmartDashboard.getNumber("ShooterP", 0));
-        kShooterPIDControllerBottom.setP(SmartDashboard.getNumber("ShooterP", 0));
+        SmartLogger.getNumber("ShooterPTop", (value) -> {
+            kShooterPIDControllerTop.setP(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kPTop);
+
+        SmartLogger.getNumber("ShooterITop", (value) -> {
+            kShooterPIDControllerTop.setI(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kITop);
         
-        kShooterPIDControllerTop.setI(SmartDashboard.getNumber("ShooterI", 0));
-        kShooterPIDControllerBottom.setI(SmartDashboard.getNumber("ShooterI", 0));
+        SmartLogger.getNumber("ShooterDTop", (value) -> {
+            kShooterPIDControllerTop.setD(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kDTop);
+
+
+        SmartLogger.getNumber("ShooterPBottom", (value) -> {
+            kShooterPIDControllerBottom.setP(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kPBottom);
+
+        SmartLogger.getNumber("ShooterIBottom", (value) -> {
+            kShooterPIDControllerBottom.setI(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kIBottom);
+        
+        SmartLogger.getNumber("ShooterDBottom", (value) -> {
+            kShooterPIDControllerBottom.setD(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kDBottom);
+        
+
+        SmartLogger.getNumber("SetBottomRPM", (value) -> {
+            kShooterPIDControllerBottom.setSetpoint(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), 0);
+        
+        SmartLogger.getNumber("SetTopRPM", (value) -> {
+            kShooterPIDControllerTop.setSetpoint(value);
+        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), 0);
 
         updateSmartdashboard();
 
@@ -75,8 +103,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setRPM(double rpmBottom, double rpmTop) {
-        kRpmBottom = rpmBottom;
-        kRpmTop = rpmTop;
+        kShooterPIDControllerTop.setSetpoint(rpmTop);
+        kShooterPIDControllerBottom.setSetpoint(rpmBottom);
     }
 
     public void setManual(double bottomValue, double topValue) {
@@ -97,25 +125,33 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void calculatePID() {
-        double errBottom = kShooterPIDControllerBottom.calculate(bottomEncoder.getVelocity(), kRpmBottom);
-        double errTop = kShooterPIDControllerTop.calculate(topEncoder.getVelocity(), -kRpmTop); // Top runs backwards,
+        double errBottom = kShooterPIDControllerBottom.calculate(bottomEncoder.getVelocity());
+        double errTop = kShooterPIDControllerTop.calculate(topEncoder.getVelocity()); // Top runs backwards,
                                                                                                 // so target is negative
 
-        double ffBottom = ShooterConstants.kFF * kRpmBottom;
-        double ffTop = ShooterConstants.kFF * -kRpmTop; // Top runs backwards
+        double ffBottom = ShooterConstants.kFF * kShooterPIDControllerBottom.getSetpoint();
+        double ffTop = ShooterConstants.kFF * kShooterPIDControllerTop.getSetpoint(); // Top runs backwards
 
         bottomMotor.set(errBottom + ffBottom);
         topMotor.set(errTop + ffTop);
-
-        SmartDashboard.putNumber("SetValueBottom", ffBottom);
-        SmartDashboard.putNumber("SetValueTop", ffTop);
     }
 
     public void updateSmartdashboard() {
-        SmartDashboard.putNumber("BottomRPM", bottomEncoder.getVelocity());
-        SmartDashboard.putNumber("TopRPM", topEncoder.getVelocity());
+        SmartLogger.put("BottomRPM", bottomEncoder.getVelocity(), EnumSet.of(SmartLogger.LogLevel.DEBUG, SmartLogger.LogLevel.SHOOTER_TUNING));
+        SmartLogger.put("TopRPM", topEncoder.getVelocity(), EnumSet.of(SmartLogger.LogLevel.DEBUG, SmartLogger.LogLevel.SHOOTER_TUNING));
 
-        SmartDashboard.putNumber("TargetRPMBottom", kRpmBottom);
-        SmartDashboard.putNumber("TargetRPMTop", kRpmTop);
+        SmartLogger.put("TargetRPMBottom", kShooterPIDControllerBottom.getSetpoint(), EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING));
+        SmartLogger.put("TargetRPMTop", kShooterPIDControllerTop.getSetpoint(), EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING));
+
+        SmartLogger.put("ShooterPIDEnabled", pidEnabled, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING, SmartLogger.LogLevel.DEBUG));
+    }
+
+    public void startShooter(){
+        pidEnabled = true;
+    }
+
+    public void stopShooter(){
+        pidEnabled = false;
+        setManual(0, 0);
     }
 }

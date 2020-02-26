@@ -33,8 +33,8 @@ public class StartShooter extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-      double bRPM = -4000;// SmartDashboard.getNumber("SetBottomRPM", 0);
-      double tRPM = -5000;//SmartDashboard.getNumber("SetTopRPM", 0);
+      double bRPM = 5000;// SmartDashboard.getNumber("SetBottomRPM", 0);
+      double tRPM = 4000;//SmartDashboard.getNumber("SetTopRPM", 0);
 
       m_subsystem.pidEnabled = true;
       m_subsystem.setRPM(bRPM, tRPM);

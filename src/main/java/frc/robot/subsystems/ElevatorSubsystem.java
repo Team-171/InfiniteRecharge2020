@@ -13,11 +13,14 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.EnumSet;
+
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import frc.robot.SmartLogger;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -56,21 +59,29 @@ public class ElevatorSubsystem extends SubsystemBase {
         kElevatorPIDController.setSetpoint(0);
         kElevatorPIDController.setTolerance(0.1);
         kElevatorPIDController.setIntegratorRange(-0.1, 0.1);
-
-        SmartDashboard.putNumber("Elevator I", 0);
     }
 
     @Override
     public void periodic() {
-        kElevatorPIDController.setI(SmartDashboard.getNumber("Elevator I", 0));
+        SmartLogger.getNumber("Elevator P", (value) -> {
+            kElevatorPIDController.setP(value);
+        }, EnumSet.of(SmartLogger.LogLevel.ELEVATOR_TUNING), ElevatorConstants.kP);
+
+        SmartLogger.getNumber("Elevator I", (value) -> {
+            kElevatorPIDController.setI(value);
+        }, EnumSet.of(SmartLogger.LogLevel.ELEVATOR_TUNING), ElevatorConstants.kI);
+
+        SmartLogger.getNumber("Elevator D", (value) -> {
+            kElevatorPIDController.setD(value);
+        }, EnumSet.of(SmartLogger.LogLevel.ELEVATOR_TUNING), ElevatorConstants.kD);
 
         if(!overridden)
         {
             moveManual(kElevatorPIDController.calculate(getAvgEncoderPos()));
         }
 
-        SmartDashboard.putNumber("Elevator Height", getAvgEncoderPos());
-        SmartDashboard.putNumber("Elevator Speed", elevatorMotor1.get());
+        SmartLogger.put("Elevator Height", getAvgEncoderPos(), EnumSet.of(SmartLogger.LogLevel.DEBUG, SmartLogger.LogLevel.ELEVATOR_TUNING));
+        SmartLogger.put("Elevator Speed", elevatorMotor1.get(), EnumSet.of(SmartLogger.LogLevel.DEBUG, SmartLogger.LogLevel.ELEVATOR_TUNING));
     }
 
     public void moveElevator(double speed) {
@@ -97,6 +108,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         {
             elevatorMotor1.set(0);
         }
+
+        SmartLogger.put("In Limit", inLimits(speed), EnumSet.of(SmartLogger.LogLevel.DEBUG));
     }
 
     public boolean inLimits(double speed) {

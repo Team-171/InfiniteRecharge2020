@@ -58,6 +58,6 @@ public class ShintakeSubsystem extends SubsystemBase {
     //       allowBall = true;
     //   }
 
-      SmartDashboard.putNumber("TopShintake", topProxSwitch.getVoltage());
+    //   SmartDashboard.putNumber("TopShintake", topProxSwitch.getVoltage());
   }
 }
