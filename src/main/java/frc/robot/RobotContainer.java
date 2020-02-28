@@ -115,11 +115,13 @@ public class RobotContainer {
             .whileActiveOnce(
                 new RunCommand(() -> {
                     m_shooterSubsystem.startShooter();
+                    System.out.println("start");
                 }, m_shooterSubsystem
             ), true)
             .whenInactive(
                 new RunCommand(() -> {
                     m_shooterSubsystem.stopShooter();
+                    System.out.println("stop");
                 }, m_shooterSubsystem
             ), true);
 
@@ -139,7 +141,7 @@ public class RobotContainer {
                         m_shooterSubsystem.toggleShooterAngle(ShooterAngle.UP);
                     }, m_shooterSubsystem
                 ),
-            false);
+            true);
 
         new JoystickButton(m_operatorController, 1)
             .whenPressed(
@@ -147,7 +149,7 @@ public class RobotContainer {
                         m_shooterSubsystem.toggleShooterAngle(ShooterAngle.DOWN);
                     }, m_shooterSubsystem
                 ),
-            false);
+            true);
 
 
         Button dpadUp = new Button(() -> m_operatorController.getPOV() == 0);
