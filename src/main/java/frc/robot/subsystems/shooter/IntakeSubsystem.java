@@ -12,10 +12,16 @@ import com.revrobotics.SparkMax;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-  private Talon intakeMotor = new Talon(IntakeConstants.kMotorPort);
+  private VictorSPX intakeMotor = new VictorSPX(IntakeConstants.kMotorPort);
+  public DoubleSolenoid intakeSolenoid = new DoubleSolenoid(2, 3);
+
   /**
    * Creates a new IntakeSubsystem.
    */
@@ -26,5 +32,9 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void drive(double speed) {
+      intakeMotor.set(ControlMode.PercentOutput, speed);
   }
 }

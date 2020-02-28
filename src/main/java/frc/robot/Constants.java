@@ -88,6 +88,7 @@ public final class Constants {
     public static final int kOperatorLeftTrigger = 2;
     public static final int kOperatorRightTrigger = 3;
     public static final int kOperatorLeftJoystick = 1;
+    public static final int kOperatorRightJoystick = 5;
   }
 
   public static final class ShooterConstants {
@@ -115,7 +116,7 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static int kMotorPort = 0;//TODO: get actual motor port
+    public static int kMotorPort = 9;//TODO: get actual motor port
   }
 
 }

@@ -12,6 +12,7 @@ import java.util.List;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -23,17 +24,21 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import frc.robot.commands.AimByLimelight;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.MoveIntake;
 import frc.robot.commands.StartShooter;
+import frc.robot.commands.MoveIntake.IntakePosition;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 // import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem.ShooterAngle;
+import frc.robot.subsystems.shooter.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShintakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OIConstants;
@@ -50,6 +55,7 @@ public class RobotContainer {
     private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     private final ShintakeSubsystem m_shintakeSubsystem = new ShintakeSubsystem();
+    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
 
     // The driver's controller
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -85,6 +91,14 @@ public class RobotContainer {
                 .moveElevator(
                     -getOutput(0.25, 1, m_operatorController.getRawAxis(OIConstants.kOperatorLeftJoystick))
                 ), m_elevatorSubsystem
+            )
+        );
+
+        m_intakeSubsystem.setDefaultCommand(
+            new RunCommand(() -> m_intakeSubsystem
+                .drive(
+                    getOutput(0.1, .5, m_operatorController.getRawAxis(OIConstants.kOperatorRightJoystick))
+                ), m_intakeSubsystem
             )
         );
     }
@@ -134,6 +148,13 @@ public class RobotContainer {
                     }, m_shooterSubsystem
                 ),
             false);
+
+
+        Button dpadUp = new Button(() -> m_operatorController.getPOV() == 0);
+        Button dpadDown = new Button(() -> m_operatorController.getPOV() == 180);
+        dpadUp.whenPressed(new MoveIntake(m_intakeSubsystem, IntakePosition.UP));
+        dpadDown.whenPressed(new MoveIntake(m_intakeSubsystem, IntakePosition.DOWN));
+
     }
 
     public void teleopInit(){
