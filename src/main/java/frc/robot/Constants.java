@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public final class Constants {
 
-    public static final EnumSet<SmartLogger.LogLevel> robotLogLevel = EnumSet.of(SmartLogger.LogLevel.ELEVATOR_TUNING);
+    public static final EnumSet<SmartLogger.LogLevel> robotLogLevel = EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING);
 
   public static final class DriveConstants {
     public static final int kLeftMotor1Port = 1;
