@@ -32,7 +32,7 @@ public class ShintakeSubsystem extends SubsystemBase {
   {
       if(speed > 0)
       {
-          topMotor.set(speed);
+          topMotor.set(speed * .75);
 
           if(allowBall)
           {
@@ -41,7 +41,7 @@ public class ShintakeSubsystem extends SubsystemBase {
       }
       else
       {
-          topMotor.set(speed);
+          topMotor.set(speed * .75);
           bottomMotor.set(speed);
       }
   }

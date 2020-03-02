@@ -97,7 +97,7 @@ public class RobotContainer {
         m_intakeSubsystem.setDefaultCommand(
             new RunCommand(() -> m_intakeSubsystem
                 .drive(
-                    getOutput(0.1, .5, m_operatorController.getRawAxis(OIConstants.kOperatorRightJoystick))
+                    getOutput(0.1, 1, m_operatorController.getRawAxis(OIConstants.kOperatorRightJoystick))
                 ), m_intakeSubsystem
             )
         );
