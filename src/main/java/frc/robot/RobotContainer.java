@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.GenericHID;
@@ -162,7 +163,10 @@ public class RobotContainer {
     public void teleopInit(){
         m_shooterSubsystem.toggleShooterAngle(ShooterAngle.DOWN);
         m_elevatorSubsystem.resetPosition();
-        // m_elevatorSubsystem.setPos(ElevatorConstants.kHomePosition);
+
+        SmartRunner.run(() -> {
+            m_elevatorSubsystem.setPos(ElevatorConstants.kHomePosition);
+        }, EnumSet.of(SmartRunner.RunLevel.MATCH));
     }
 
     /**

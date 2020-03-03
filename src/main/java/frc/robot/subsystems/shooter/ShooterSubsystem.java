@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.SmartLogger;
+import frc.robot.SmartRunner;
 import frc.robot.Constants.ShooterConstants;
 
 import java.util.EnumSet;
@@ -55,44 +55,52 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterSolenoid.set(DoubleSolenoid.Value.kForward);
         kShooterPIDControllerBottom.setIntegratorRange(-0.08, 0.08);
         kShooterPIDControllerTop.setIntegratorRange(-0.08, 0.08);
+        kShooterPIDControllerTop.setTolerance(ShooterConstants.rpmTolerance);
+        kShooterPIDControllerBottom.setTolerance(ShooterConstants.rpmTolerance);
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        SmartLogger.getNumber("ShooterPTop", (value) -> {
+        SmartRunner.Logger.getNumber("ShooterPTop", (value) -> {
             kShooterPIDControllerTop.setP(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kPTop);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), ShooterConstants.kPTop);
 
-        SmartLogger.getNumber("ShooterITop", (value) -> {
+        SmartRunner.Logger.getNumber("ShooterITop", (value) -> {
             kShooterPIDControllerTop.setI(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kITop);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), ShooterConstants.kITop);
         
-        SmartLogger.getNumber("ShooterDTop", (value) -> {
+        SmartRunner.Logger.getNumber("ShooterDTop", (value) -> {
             kShooterPIDControllerTop.setD(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kDTop);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), ShooterConstants.kDTop);
 
 
-        SmartLogger.getNumber("ShooterPBottom", (value) -> {
+        SmartRunner.Logger.getNumber("ShooterPBottom", (value) -> {
             kShooterPIDControllerBottom.setP(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kPBottom);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), ShooterConstants.kPBottom);
 
-        SmartLogger.getNumber("ShooterIBottom", (value) -> {
+        SmartRunner.Logger.getNumber("ShooterIBottom", (value) -> {
             kShooterPIDControllerBottom.setI(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kIBottom);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), ShooterConstants.kIBottom);
         
-        SmartLogger.getNumber("ShooterDBottom", (value) -> {
+        SmartRunner.Logger.getNumber("ShooterDBottom", (value) -> {
             kShooterPIDControllerBottom.setD(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), ShooterConstants.kDBottom);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), ShooterConstants.kDBottom);
         
 
-        SmartLogger.getNumber("SetBottomRPM", (value) -> {
+        SmartRunner.Logger.getNumber("SetBottomRPM", (value) -> {
             kShooterPIDControllerBottom.setSetpoint(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), 0);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), 0);
         
-        SmartLogger.getNumber("SetTopRPM", (value) -> {
+        SmartRunner.Logger.getNumber("SetTopRPM", (value) -> {
             kShooterPIDControllerTop.setSetpoint(value);
-        }, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING), 0);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), 0);
+        
+
+        SmartRunner.Logger.getNumber("ShooterRPMTolerance", (value) -> {
+            kShooterPIDControllerTop.setTolerance(value);
+            kShooterPIDControllerBottom.setTolerance(value);
+        }, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING), ShooterConstants.rpmTolerance);
 
         updateSmartdashboard();
 
@@ -136,13 +144,19 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void updateSmartdashboard() {
-        SmartLogger.put("BottomRPM", bottomEncoder.getVelocity(), EnumSet.of(SmartLogger.LogLevel.DEBUG, SmartLogger.LogLevel.SHOOTER_TUNING));
-        SmartLogger.put("TopRPM", topEncoder.getVelocity(), EnumSet.of(SmartLogger.LogLevel.DEBUG, SmartLogger.LogLevel.SHOOTER_TUNING));
+        SmartRunner.Logger.put("BottomRPM", bottomEncoder.getVelocity(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.SHOOTER_TUNING));
+        SmartRunner.Logger.put("TopRPM", topEncoder.getVelocity(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.SHOOTER_TUNING));
 
-        SmartLogger.put("TargetRPMBottom", kShooterPIDControllerBottom.getSetpoint(), EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING));
-        SmartLogger.put("TargetRPMTop", kShooterPIDControllerTop.getSetpoint(), EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING));
+        SmartRunner.Logger.put("TargetRPMBottom", kShooterPIDControllerBottom.getSetpoint(), EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING));
+        SmartRunner.Logger.put("TargetRPMTop", kShooterPIDControllerTop.getSetpoint(), EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING));
 
-        SmartLogger.put("ShooterPIDEnabled", pidEnabled, EnumSet.of(SmartLogger.LogLevel.SHOOTER_TUNING, SmartLogger.LogLevel.DEBUG));
+        SmartRunner.Logger.put("ShooterPIDEnabled", pidEnabled, EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING, SmartRunner.RunLevel.DEBUG));
+
+        SmartRunner.Logger.put("Shooter Within Tolerance", atSetpoint(), EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING, SmartRunner.RunLevel.DEBUG));
+    }
+
+    public boolean atSetpoint(){
+        return !pidEnabled || (kShooterPIDControllerTop.atSetpoint() && kShooterPIDControllerBottom.atSetpoint());
     }
 
     public void startShooter(){
