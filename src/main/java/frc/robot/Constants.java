@@ -89,6 +89,8 @@ public final class Constants {
     public static final int kOperatorRightTrigger = 3;
     public static final int kOperatorLeftJoystick = 1;
     public static final int kOperatorRightJoystick = 5;
+    public static final int kOperatorLeftBumper = 5;
+    public static final int kOperatorRightBumper = 6;
   }
 
   public static final class ShooterConstants {

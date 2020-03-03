@@ -46,6 +46,14 @@ public class ShintakeSubsystem extends SubsystemBase {
       }
   }
 
+  public void driveTop(double speed){
+      topMotor.set(speed);
+  }
+
+  public void driveBottom(double speed){
+      bottomMotor.set(speed);
+  }
+
   @Override
   public void periodic() {
     //   if(bottomProxSwitch.get && allowBall)

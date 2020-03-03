@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -79,11 +80,39 @@ public class RobotContainer {
             )
         );
 
+        // m_shintakeSubsystem.setDefaultCommand(
+        //     new RunCommand(() -> m_shintakeSubsystem
+        //         .drive(m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger) 
+        //             - m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)
+        //         ), m_shintakeSubsystem
+        //     )
+        // );
+
         m_shintakeSubsystem.setDefaultCommand(
-            new RunCommand(() -> m_shintakeSubsystem
-                .drive(m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger) 
-                    - m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)
-                ), m_shintakeSubsystem
+            new RunCommand(() -> {
+                m_shintakeSubsystem
+                    .driveTop(
+                        (m_shooterSubsystem.atSetpoint() //if the shooter is at the right RPM 
+                            ? (m_operatorController.getRawButton(OIConstants.kOperatorLeftBumper)  //and the bumper is pressed
+                                ? -m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger)      //run the top shintake in reverse
+                                : m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger)       //else run the top shintake forward
+                            ) 
+                            : 0                          //else dont run the shintake
+                        )
+                    );
+                    
+                m_shintakeSubsystem
+                    .driveBottom(
+                        (m_shooterSubsystem.atSetpoint() //if the shooter is at the right RPM 
+                            ? (m_operatorController.getRawButton(OIConstants.kOperatorRightBumper)  //and the bumper is pressed
+                                ? -m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)      //run the bottom shintake in reverse
+                                : m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)       //else run the bottom shintake forward
+                            ) 
+                            : 0                          //else dont run the shintake
+                        )
+                    );
+                },
+                m_shintakeSubsystem
             )
         );
 
@@ -116,13 +145,11 @@ public class RobotContainer {
             .whileActiveOnce(
                 new RunCommand(() -> {
                     m_shooterSubsystem.startShooter();
-                    System.out.println("start");
                 }, m_shooterSubsystem
             ), true)
             .whenInactive(
                 new RunCommand(() -> {
                     m_shooterSubsystem.stopShooter();
-                    System.out.println("stop");
                 }, m_shooterSubsystem
             ), true);
 
@@ -167,6 +194,10 @@ public class RobotContainer {
         SmartRunner.run(() -> {
             m_elevatorSubsystem.setPos(ElevatorConstants.kHomePosition);
         }, EnumSet.of(SmartRunner.RunLevel.MATCH));
+    }
+
+    public void teleopPeriodic(){
+        
     }
 
     /**
