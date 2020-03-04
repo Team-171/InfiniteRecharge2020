@@ -153,7 +153,7 @@ public class RobotContainer {
                 }, m_shooterSubsystem
             ), true);
 
-        new JoystickButton(m_driverController, 6).whileActiveContinuous(new AimByLimelight(m_driveSubsystem), true);
+        new JoystickButton(m_operatorController, 6).whileActiveContinuous(new AimByLimelight(m_driveSubsystem), true);
         
         new JoystickButton(m_operatorController, 3)
             .whenPressed(
