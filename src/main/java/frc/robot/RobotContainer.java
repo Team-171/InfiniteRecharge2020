@@ -80,41 +80,46 @@ public class RobotContainer {
             )
         );
 
-        // m_shintakeSubsystem.setDefaultCommand(
-        //     new RunCommand(() -> m_shintakeSubsystem
-        //         .drive(m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger) 
-        //             - m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)
-        //         ), m_shintakeSubsystem
-        //     )
-        // );
-
         m_shintakeSubsystem.setDefaultCommand(
-            new RunCommand(() -> {
-                m_shintakeSubsystem
-                    .driveTop(
-                        (m_shooterSubsystem.atSetpoint() //if the shooter is at the right RPM 
-                            ? (m_operatorController.getRawButton(OIConstants.kOperatorLeftBumper)  //and the bumper is pressed
-                                ? -m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger)      //run the top shintake in reverse
-                                : m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger)       //else run the top shintake forward
-                            ) 
-                            : 0                          //else dont run the shintake
+            new RunCommand(() -> m_shintakeSubsystem
+                .drive(
+                    (m_shooterSubsystem.atSetpoint() //if the shooter is at the right rpm
+                        ? (m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger) //run based on the triggers
+                            - m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)
                         )
-                    );
-                    
-                m_shintakeSubsystem
-                    .driveBottom(
-                        (m_shooterSubsystem.atSetpoint() //if the shooter is at the right RPM 
-                            ? (m_operatorController.getRawButton(OIConstants.kOperatorRightBumper)  //and the bumper is pressed
-                                ? -m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)      //run the bottom shintake in reverse
-                                : m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)       //else run the bottom shintake forward
-                            ) 
-                            : 0                          //else dont run the shintake
-                        )
-                    );
-                },
-                m_shintakeSubsystem
+                    : 0                              //else don't run Shintake
+                    )
+                ), m_shintakeSubsystem
             )
         );
+
+        // m_shintakeSubsystem.setDefaultCommand(
+        //     new RunCommand(() -> {
+        //         m_shintakeSubsystem
+        //             .driveTop(
+        //                 (m_shooterSubsystem.atSetpoint() //if the shooter is at the right RPM 
+        //                     ? (m_operatorController.getRawButton(OIConstants.kOperatorLeftBumper)  //and the bumper is pressed
+        //                         ? -m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger)      //run the top shintake in reverse
+        //                         : m_operatorController.getRawAxis(OIConstants.kOperatorLeftTrigger)       //else run the top shintake forward
+        //                     ) 
+        //                     : 0                          //else dont run the shintake
+        //                 )
+        //             );
+                    
+        //         m_shintakeSubsystem
+        //             .driveBottom(
+        //                 (m_shooterSubsystem.atSetpoint() //if the shooter is at the right RPM 
+        //                     ? (m_operatorController.getRawButton(OIConstants.kOperatorRightBumper)  //and the bumper is pressed
+        //                         ? -m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)      //run the bottom shintake in reverse
+        //                         : m_operatorController.getRawAxis(OIConstants.kOperatorRightTrigger)       //else run the bottom shintake forward
+        //                     ) 
+        //                     : 0                          //else dont run the shintake
+        //                 )
+        //             );
+        //         },
+        //         m_shintakeSubsystem
+        //     )
+        // );
 
         m_elevatorSubsystem.setDefaultCommand(
             new RunCommand(() -> m_elevatorSubsystem
