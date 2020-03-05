@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import frc.robot.commands.AimByLimelight;
+import frc.robot.commands.DriveForward;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.MoveIntake;
 import frc.robot.commands.StartShooter;
@@ -203,6 +204,10 @@ public class RobotContainer {
 
     public void teleopPeriodic(){
         
+    }
+
+    public void autoInit(){
+        new DriveForward(m_driveSubsystem).schedule(false);
     }
 
     /**
