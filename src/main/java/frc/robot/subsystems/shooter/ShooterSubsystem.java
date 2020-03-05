@@ -53,10 +53,15 @@ public class ShooterSubsystem extends SubsystemBase {
         // bottomMotor.setOpenLoopRampRate(0.1);
 
         shooterSolenoid.set(DoubleSolenoid.Value.kForward);
+
         kShooterPIDControllerBottom.setIntegratorRange(-0.08, 0.08);
         kShooterPIDControllerTop.setIntegratorRange(-0.08, 0.08);
+
         kShooterPIDControllerTop.setTolerance(ShooterConstants.rpmTolerance);
         kShooterPIDControllerBottom.setTolerance(ShooterConstants.rpmTolerance);
+
+        kShooterPIDControllerTop.setSetpoint(ShooterConstants.rpmTop);
+        kShooterPIDControllerBottom.setSetpoint(ShooterConstants.rpmBottom);
     }
 
     @Override

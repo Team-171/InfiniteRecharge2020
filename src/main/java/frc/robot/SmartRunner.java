@@ -22,7 +22,8 @@ public class SmartRunner {
         MATCH, 
         DEBUG, 
         SHOOTER_TUNING, 
-        ELEVATOR_TUNING
+        ELEVATOR_TUNING,
+        DRIVETRAIN_TUNING
     }
 
     private static EnumSet<RunLevel> levels = Constants.robotLogLevel;

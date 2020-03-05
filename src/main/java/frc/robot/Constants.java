@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public final class Constants {
 
-    public static final EnumSet<SmartRunner.RunLevel> robotLogLevel = EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING);
+    public static final EnumSet<SmartRunner.RunLevel> robotLogLevel = EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING, SmartRunner.RunLevel.DEBUG);
 
   public static final class DriveConstants {
     public static final int kLeftMotor1Port = 1;
@@ -35,16 +35,18 @@ public final class Constants {
 
     public static final double kRampRate = 0.25;
 
-    public static final double P = 0.001;
-    public static final double I = 0;
-    public static final double D = 0;
+    public static final double P = 0.02;
+    public static final double I = 0.03;
+    public static final double D = 0.005;
+
+    public static final double tolerance = 2;
 
     public static final int[] kLeftEncoderPorts = new int[]{0, 1};
     public static final int[] kRightEncoderPorts = new int[]{2, 3};
     public static final boolean kLeftEncoderReversed = false;
     public static final boolean kRightEncoderReversed = true;
 
-    public static final int kEncoderCPR = 1000;  // NEOs (42), but may use REV Robotics hex shaft encoders (8192 counts per revolution)
+    public static final int kEncoderCPR = 42;  // NEOs (42), but may use REV Robotics hex shaft encoders (8192 counts per revolution)
     public static final double kWheelDiameterInches = 6;
     public static final double kEncoderDistancePerRotation =
         // Assumes the encoders are directly mounted on the wheel shafts
@@ -72,7 +74,7 @@ public final class Constants {
 
     //TODO: Get real min and max elevator heights
     public static double minHeight = -6.0;
-    public static double maxHeight = 150.0;
+    public static double maxHeight = 135.0;
   }
 
   public static final class OIConstants {
@@ -107,7 +109,10 @@ public final class Constants {
     public static double kIBottom = 0.001;
     public static double kDBottom = 0.0;
 
-    public static double rpmTolerance = 100;
+    public static double rpmTolerance = 200;
+
+    public static double rpmTop = 4000;
+    public static double rpmBottom = 5000;
   }
 
   public static final class ShintakeConstants {

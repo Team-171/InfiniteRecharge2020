@@ -25,7 +25,8 @@ public class ShintakeSubsystem extends SubsystemBase {
   private AnalogInput bottomProxSwitch = new AnalogInput(ShintakeConstants.kBottomProxSwitch);
 
   public ShintakeSubsystem() {
-
+        topMotor.setClosedLoopRampRate(0.25);
+        bottomMotor.setClosedLoopRampRate(0.25);
   }
 
   public void drive(double speed)
@@ -47,7 +48,7 @@ public class ShintakeSubsystem extends SubsystemBase {
   }
 
   public void driveTop(double speed){
-      topMotor.set(speed);
+      topMotor.set(speed * 0.4);
   }
 
   public void driveBottom(double speed){
