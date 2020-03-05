@@ -1,10 +1,13 @@
 package frc.robot.subsystems;
 
+import java.util.EnumSet;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -17,7 +20,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.SmartRunner;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -53,14 +56,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final AHRS navx = new AHRS(SerialPort.Port.kUSB);
 
-    private final PIDController turnController = new PIDController(
-        SmartDashboard.getNumber("DrivetrainP", DriveConstants.P), 
-        SmartDashboard.getNumber("DrivetrainI", DriveConstants.I), 
-        SmartDashboard.getNumber("DrivetrainD", DriveConstants.D)
-    );
+    private final PIDController turnController = new PIDController(DriveConstants.P, DriveConstants.I, DriveConstants.D);
 
-    public boolean autoAim = false;
-    private double limelightAngle = 0;
+    private boolean autoAim = false;
 
     // Odometry class for tracking robot pose
     private final DifferentialDriveOdometry m_odometry;
@@ -80,6 +78,9 @@ public class DriveSubsystem extends SubsystemBase {
         m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
         m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
 
+        turnController.setIntegratorRange(-0.2, 0.2);
+        turnController.setTolerance(DriveConstants.tolerance);
+
         // m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
         // m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
 
@@ -88,19 +89,32 @@ public class DriveSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("DrivetrainD", DriveConstants.D);
 
         m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+
+        // Make sure limelight light is off
+        
     }
 
     @Override
     public void periodic() {
-        // Update the odometry in the periodic block
-        // m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getPosition(),
-        //                   m_rightEncoder.getPosition());
+        SmartRunner.Logger.getNumber("DrivetrainP", (value) -> {
+            turnController.setP(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.P);
+
+        SmartRunner.Logger.getNumber("DrivetrainI", (value) -> {
+            turnController.setI(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.I);
+
+        SmartRunner.Logger.getNumber("DrivetrainD", (value) -> {
+            turnController.setD(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.D);
+
+        SmartRunner.Logger.getNumber("Draintrain Tolerance", (value) -> {
+            turnController.setTolerance(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.tolerance);
+
+        SmartRunner.Logger.put("AutoAim Error", turnController.getPositionError(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
 
         if (autoAim) {
-            turnController.setPID(
-                SmartDashboard.getNumber("DrivetrainP", DriveConstants.P), 
-                SmartDashboard.getNumber("DrivetrainI", DriveConstants.I), 
-                SmartDashboard.getNumber("DrivetrainD", DriveConstants.D));
             calculatePID();
         }
 
@@ -175,15 +189,27 @@ public class DriveSubsystem extends SubsystemBase {
         // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
     // }
 
+    public void startAutoAim(){
+        autoAim = true;
+    }
+
+    public void stopAutoAim(){
+        autoAim = false;
+        turnController.reset();
+    }
+
+    public boolean isOnTarget(){
+        return turnController.atSetpoint();
+    }
+
     public double getHeading() {
         return navx.getAngle();
     }
 
     public void calculatePID() {
-        double currentHeading = getHeading();
-        double targetHeading = currentHeading + limelightAngle;
-        double err = turnController.calculate(currentHeading, targetHeading);
+        double err = turnController.calculate(getHeading());
 
+        SmartRunner.Logger.put("Drivetrain PID Output", err, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
         m_drive.arcadeDrive(0, err);
         // SmartDashboard.putNumber("Current Heading", currentHeading);
         // SmartDashboard.putNumber("Target Heading", targetHeading);
@@ -191,7 +217,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void setTargetAngle(double angle) {
-        limelightAngle = angle;
+        turnController.setSetpoint(angle + getHeading());
     }
 
     public Pose2d getPose() {

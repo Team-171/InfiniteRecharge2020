@@ -10,6 +10,7 @@ package frc.robot;
 import java.util.EnumSet;
 import java.util.List;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,7 +25,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import frc.robot.commands.AimByLimelight;
+import frc.robot.commands.AimAndShootByLimelight;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.MoveIntake;
 import frc.robot.commands.StartShooter;
@@ -158,8 +159,22 @@ public class RobotContainer {
                 }, m_shooterSubsystem
             ), true);
 
-        new JoystickButton(m_operatorController, 6).whileActiveContinuous(new AimByLimelight(m_driveSubsystem), true);
+        // Turn light on
+        // new JoystickButton(m_operatorController, 6).whenPressed(new RunCommand(() -> {
+            
+        //     System.out.println("ON");
+        // }), false).whenReleased(new RunCommand(() -> {
+            
+        //     System.out.println("OFF");
+        // }), false);
+
+        new JoystickButton(m_operatorController, 6)
+            .whileActiveContinuous(
+                new AimAndShootByLimelight(m_driveSubsystem, m_shooterSubsystem, m_shintakeSubsystem), true);
         
+        // Turn light off
+        // new JoystickButton(m_operatorController, 6);
+
         new JoystickButton(m_operatorController, 3)
             .whenPressed(
                 new RunCommand(() -> {
