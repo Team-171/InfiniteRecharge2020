@@ -12,7 +12,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveForward extends CommandBase {
 
-    private double distance = 31;
+    private double distance = 38;
     private DriveSubsystem m_driveSubsystem;
 
     public DriveForward(DriveSubsystem driveSubsystem) {
