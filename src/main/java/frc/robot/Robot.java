@@ -7,7 +7,9 @@
 
 package frc.robot;
 
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
@@ -26,8 +28,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private NetworkTable limeLightTable;
 //   private Talon m = new Talon(8);
-  private Servo s = new Servo(7);
+//   private Servo s = new Servo(7);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -38,8 +41,12 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    CameraServer.getInstance().startAutomaticCapture(0);
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
+    camera.setResolution(160, 120);
+    camera.setFPS(15);
+
+    limeLightTable = NetworkTableInstance.getDefault().getTable("limelight");
+    limeLightTable.getEntry("ledMode").setNumber(1);
   }
 
   /**
@@ -52,7 +59,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     //   m.set(0.5);
-      s.set(0.5);
+    //   s.set(0.5);
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -67,6 +74,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+    limeLightTable.getEntry("ledMode").setNumber(1);
   }
 
   @Override
@@ -78,12 +86,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+      limeLightTable.getEntry("ledMode").setNumber(1);
     // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
+    // if (m_autonomousCommand != null) {
+    //   m_autonomousCommand.schedule();
+    // }
 
     m_robotContainer.autoInit();
   }
@@ -97,6 +106,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    limeLightTable.getEntry("ledMode").setNumber(1);
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -104,6 +114,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    m_robotContainer.teleopInit();
   }
 
   /**

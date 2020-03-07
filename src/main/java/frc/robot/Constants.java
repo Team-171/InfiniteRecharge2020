@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public final class Constants {
 
-    public static final EnumSet<SmartRunner.RunLevel> robotLogLevel = EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING, SmartRunner.RunLevel.DEBUG);
+    public static final EnumSet<SmartRunner.RunLevel> robotLogLevel = EnumSet.of(SmartRunner.RunLevel.MATCH);
 
   public static final class DriveConstants {
     public static final int kLeftMotor1Port = 1;
@@ -35,11 +35,15 @@ public final class Constants {
 
     public static final double kRampRate = 0.25;
 
-    public static final double P = 0.02;
-    public static final double I = 0.03;
-    public static final double D = 0.005;
+    public static final double turnP = 0.02;
+    public static final double turnI = 0.03;
+    public static final double turnD = 0.005;
+    public static final double turnTolerance = 2;
 
-    public static final double tolerance = 2;
+    public static final double distP = 0.016;
+    public static final double distI = 0.003;
+    public static final double distD = 0.00;
+    public static final double distTolerance = 2;
 
     public static final int[] kLeftEncoderPorts = new int[]{0, 1};
     public static final int[] kRightEncoderPorts = new int[]{2, 3};
@@ -48,7 +52,9 @@ public final class Constants {
 
     public static final int kEncoderCPR = 42;  // NEOs (42), but may use REV Robotics hex shaft encoders (8192 counts per revolution)
     public static final double kWheelDiameterInches = 6;
+    public static final double kMotorToWheelRatio = 5;
     public static final double kEncoderDistancePerRotation =
+        kMotorToWheelRatio *
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterInches * Math.PI);
   }
@@ -81,6 +87,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kDriverYAxis = 1;
     public static final int kDriverTurnAxis = 2;
+    public static final int kDriverSpeedAxis = 3;
 
     public static final double kmaxTurnMultiplier = .8;
     public static final double kminTurnMultiplier = .55;
@@ -103,15 +110,15 @@ public final class Constants {
 
     public static double kPTop = .00015;
     public static double kITop = 0.001;
-    public static double kDTop = 0.0;
+    public static double kDTop = 0.00004;
     
     public static double kPBottom = .00025;
     public static double kIBottom = 0.001;
-    public static double kDBottom = 0.0;
+    public static double kDBottom = 0.00004;
 
-    public static double rpmTolerance = 200;
+    public static double rpmTolerance = 100;
 
-    public static double rpmTop = 4000;
+    public static double rpmTop = 3000;
     public static double rpmBottom = 5000;
   }
 

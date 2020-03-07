@@ -80,7 +80,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             moveManual(kElevatorPIDController.calculate(getAvgEncoderPos()));
         }
 
-        SmartRunner.Logger.put("Elevator Height", getAvgEncoderPos(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.ELEVATOR_TUNING));
+        SmartRunner.Logger.put("Elevator Height", getAvgEncoderPos(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.ELEVATOR_TUNING, SmartRunner.RunLevel.MATCH));
         SmartRunner.Logger.put("Elevator Speed", elevatorMotor1.get(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.ELEVATOR_TUNING));
     }
 

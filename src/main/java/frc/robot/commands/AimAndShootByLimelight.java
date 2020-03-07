@@ -52,13 +52,13 @@ public class AimAndShootByLimelight extends CommandBase {
   @Override
   public void execute() {
       if (limeLightTable.getEntry("tv").getDouble(0) != 0) {
-          m_driveSubsystem.startAutoAim();
-          m_driveSubsystem.setTargetAngle(limeLightTable.getEntry("tx").getDouble(0));
+          m_driveSubsystem.setPIDMode(DriveSubsystem.PIDMode.TURN);
+          m_driveSubsystem.setRelativeTargetAngle(limeLightTable.getEntry("tx").getDouble(0));
       } else {
           m_driveSubsystem.arcadeDrive(0, 0);
       }
 
-      if(m_driveSubsystem.isOnTarget() && m_shooterSubsystem.atSetpoint()){
+      if(m_driveSubsystem.isOnTargetAngle() && m_shooterSubsystem.atSetpoint()){
           m_shintakeSubsystem.drive(1);
       }
       else{
@@ -69,7 +69,7 @@ public class AimAndShootByLimelight extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_driveSubsystem.stopAutoAim();
+    m_driveSubsystem.setPIDMode(DriveSubsystem.PIDMode.NONE);
     m_shooterSubsystem.stopShooter();
     m_shintakeSubsystem.drive(0);
     limeLightTable.getEntry("ledMode").setNumber(1);

@@ -28,6 +28,13 @@ import frc.robot.Constants.ShooterConstants;
 
 public class DriveSubsystem extends SubsystemBase {
 
+    public enum PIDMode {
+        TURN,
+        DIST,
+        DIST_WITH_TURN,
+        NONE
+    }
+
     private final CANSparkMax leftMotor1 = new CANSparkMax(DriveConstants.kLeftMotor1Port, MotorType.kBrushless);
     private final CANSparkMax leftMotor2 = new CANSparkMax(DriveConstants.kLeftMotor2Port, MotorType.kBrushless);
     private final CANSparkMax rightMotor1 = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
@@ -56,9 +63,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final AHRS navx = new AHRS(SerialPort.Port.kUSB);
 
-    private final PIDController turnController = new PIDController(DriveConstants.P, DriveConstants.I, DriveConstants.D);
+    private final PIDController turnController = new PIDController(DriveConstants.turnP, DriveConstants.turnI, DriveConstants.turnD);
 
-    private boolean autoAim = false;
+    private final PIDController distController = new PIDController(DriveConstants.distP, DriveConstants.distI, DriveConstants.distD);
+
+    private PIDMode pidMode = PIDMode.NONE;
 
     // Odometry class for tracking robot pose
     private final DifferentialDriveOdometry m_odometry;
@@ -79,7 +88,10 @@ public class DriveSubsystem extends SubsystemBase {
         m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRotation);
 
         turnController.setIntegratorRange(-0.2, 0.2);
-        turnController.setTolerance(DriveConstants.tolerance);
+        turnController.setTolerance(DriveConstants.turnTolerance);
+
+        distController.setIntegratorRange(-0.2, 0.2);
+        distController.setTolerance(DriveConstants.distTolerance);
 
         // m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
         // m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
@@ -96,25 +108,44 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartRunner.Logger.getNumber("DrivetrainP", (value) -> {
+        SmartRunner.Logger.getNumber("DrivetrainTurnP", (value) -> {
             turnController.setP(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.P);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnP);
 
-        SmartRunner.Logger.getNumber("DrivetrainI", (value) -> {
+        SmartRunner.Logger.getNumber("DrivetrainTurnI", (value) -> {
             turnController.setI(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.I);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnI);
 
-        SmartRunner.Logger.getNumber("DrivetrainD", (value) -> {
+        SmartRunner.Logger.getNumber("DrivetrainTurnD", (value) -> {
             turnController.setD(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.D);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnD);
 
-        SmartRunner.Logger.getNumber("Draintrain Tolerance", (value) -> {
+        SmartRunner.Logger.getNumber("Draintrain Turn Tolerance", (value) -> {
             turnController.setTolerance(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.tolerance);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnTolerance);
 
         SmartRunner.Logger.put("AutoAim Error", turnController.getPositionError(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
 
-        if (autoAim) {
+
+        SmartRunner.Logger.getNumber("DrivetrainDistP", (value) -> {
+            distController.setP(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distP);
+
+        SmartRunner.Logger.getNumber("DrivetrainDistI", (value) -> {
+            distController.setI(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distI);
+
+        SmartRunner.Logger.getNumber("DrivetrainDistD", (value) -> {
+            distController.setD(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distD);
+
+        SmartRunner.Logger.getNumber("Draintrain Dist Tolerance", (value) -> {
+            distController.setTolerance(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distTolerance);
+
+        SmartRunner.Logger.put("Drivetrain Dist Error", distController.getPositionError(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
+
+        if (pidMode != PIDMode.NONE) {
             calculatePID();
         }
 
@@ -145,8 +176,8 @@ public class DriveSubsystem extends SubsystemBase {
      * Resets the drive encoders to currently read a position of 0.
      */
     public void resetEncoders() {
-        // m_leftEncoder.reset();
-        // m_rightEncoder.reset();
+        m_leftEncoder.setPosition(0);
+        m_rightEncoder.setPosition(0);
     }
 
     /**
@@ -154,9 +185,9 @@ public class DriveSubsystem extends SubsystemBase {
      *
      * @return the average of the TWO encoder readings
      */
-    // public double getAverageEncoderDistance() {
-    //   // return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
-    // }
+    public double getAverageEncoderDistance() {
+      return (m_leftEncoder.getPosition() + m_rightEncoder.getPosition()) / 2.0;
+    }
 
     /**
      * Gets the left drive encoder.
@@ -164,7 +195,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the left drive encoder
      */
     // public Encoder getLeftEncoder() {
-    //   // return m_leftEncoder;
+    //   return m_leftEncoder;
     // }
 
     /**
@@ -173,7 +204,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the right drive encoder
      */
     // public Encoder getRightEncoder() {
-    //   // return m_rightEncoder;
+    //   return m_rightEncoder;
     // }
 
     /**
@@ -181,25 +212,34 @@ public class DriveSubsystem extends SubsystemBase {
      *
      * @param maxOutput the maximum output to which the drive will be constrained
      */
-    public void setMaxOutput(double maxOutput) {
-        m_drive.setMaxOutput(maxOutput);
-    }
+    // public void setMaxOutput(double maxOutput) {
+    //     m_drive.setMaxOutput(maxOutput);
+    // }
 
     // public DifferentialDriveWheelSpeeds getWheelSpeeds() {
         // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
     // }
 
-    public void startAutoAim(){
-        autoAim = true;
+    public void setPIDMode(PIDMode mode){
+        pidMode = mode;
+        
+        if(mode == PIDMode.NONE)
+        {
+            turnController.reset();
+            distController.reset();
+        }
     }
 
-    public void stopAutoAim(){
-        autoAim = false;
-        turnController.reset();
+    public boolean isOnTargetAngle(){
+        return turnController.atSetpoint();
+    }
+
+    public boolean isOnDistanceTarget(){
+        return distController.atSetpoint();
     }
 
     public boolean isOnTarget(){
-        return turnController.atSetpoint();
+        return isOnDistanceTarget() && isOnTargetAngle();
     }
 
     public double getHeading() {
@@ -207,17 +247,38 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void calculatePID() {
-        double err = turnController.calculate(getHeading());
+        double turnOutput = turnController.calculate(getHeading());
+        double distOutput = distController.calculate(getAverageEncoderDistance());
 
-        SmartRunner.Logger.put("Drivetrain PID Output", err, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
-        m_drive.arcadeDrive(0, err);
+        SmartRunner.Logger.put("Drivetrain Turn PID Output", turnOutput, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
+        SmartRunner.Logger.put("Drivetrain Dist PID Output", distOutput, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
+
+        switch(pidMode)
+        {
+            case TURN:
+                m_drive.arcadeDrive(0, turnOutput);
+                break;
+
+            case DIST:
+                m_drive.arcadeDrive(distOutput, 0);
+                break;
+
+            case DIST_WITH_TURN:
+                m_drive.arcadeDrive(distOutput, turnOutput);
+                break;
+        }
+
         // SmartDashboard.putNumber("Current Heading", currentHeading);
         // SmartDashboard.putNumber("Target Heading", targetHeading);
         // SmartDashboard.putNumber("Turn Value", err);
     }
 
-    public void setTargetAngle(double angle) {
+    public void setRelativeTargetAngle(double angle) {
         turnController.setSetpoint(angle + getHeading());
+    }
+
+    public void setTargetDistance(double distance){
+        distController.setSetpoint(distance);
     }
 
     public Pose2d getPose() {

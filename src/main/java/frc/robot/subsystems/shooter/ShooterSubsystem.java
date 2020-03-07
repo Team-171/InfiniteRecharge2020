@@ -149,8 +149,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void updateSmartdashboard() {
-        SmartRunner.Logger.put("BottomRPM", bottomEncoder.getVelocity(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.SHOOTER_TUNING));
-        SmartRunner.Logger.put("TopRPM", topEncoder.getVelocity(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.SHOOTER_TUNING));
+        SmartRunner.Logger.put("BottomRPM", bottomEncoder.getVelocity(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.SHOOTER_TUNING, SmartRunner.RunLevel.MATCH));
+        SmartRunner.Logger.put("TopRPM", topEncoder.getVelocity(), EnumSet.of(SmartRunner.RunLevel.DEBUG, SmartRunner.RunLevel.SHOOTER_TUNING, SmartRunner.RunLevel.MATCH));
 
         SmartRunner.Logger.put("TargetRPMBottom", kShooterPIDControllerBottom.getSetpoint(), EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING));
         SmartRunner.Logger.put("TargetRPMTop", kShooterPIDControllerTop.getSetpoint(), EnumSet.of(SmartRunner.RunLevel.SHOOTER_TUNING));
