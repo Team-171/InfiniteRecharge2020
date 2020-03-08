@@ -93,6 +93,9 @@ public class DriveSubsystem extends SubsystemBase {
         distController.setIntegratorRange(-0.2, 0.2);
         distController.setTolerance(DriveConstants.distTolerance);
 
+        // m_leftEncoder.setInverted(DriveConstants.kLeftEncoderReversed);
+        // m_rightEncoder.setInverted(DriveConstants.kRightEncoderReversed);
+
         // m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
         // m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerRotation);
 
@@ -108,42 +111,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartRunner.Logger.getNumber("DrivetrainTurnP", (value) -> {
-            turnController.setP(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnP);
-
-        SmartRunner.Logger.getNumber("DrivetrainTurnI", (value) -> {
-            turnController.setI(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnI);
-
-        SmartRunner.Logger.getNumber("DrivetrainTurnD", (value) -> {
-            turnController.setD(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnD);
-
-        SmartRunner.Logger.getNumber("Draintrain Turn Tolerance", (value) -> {
-            turnController.setTolerance(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnTolerance);
-
-        SmartRunner.Logger.put("AutoAim Error", turnController.getPositionError(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
-
-
-        SmartRunner.Logger.getNumber("DrivetrainDistP", (value) -> {
-            distController.setP(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distP);
-
-        SmartRunner.Logger.getNumber("DrivetrainDistI", (value) -> {
-            distController.setI(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distI);
-
-        SmartRunner.Logger.getNumber("DrivetrainDistD", (value) -> {
-            distController.setD(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distD);
-
-        SmartRunner.Logger.getNumber("Draintrain Dist Tolerance", (value) -> {
-            distController.setTolerance(value);
-        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distTolerance);
-
-        SmartRunner.Logger.put("Drivetrain Dist Error", distController.getPositionError(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
 
         if (pidMode != PIDMode.NONE) {
             calculatePID();
@@ -151,6 +118,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getPosition(),
                       m_rightEncoder.getPosition());
+
+        updateSmartDashboard();
     }
 
         /**
@@ -186,7 +155,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the average of the TWO encoder readings
      */
     public double getAverageEncoderDistance() {
-      return (m_leftEncoder.getPosition() + m_rightEncoder.getPosition()) / 2.0;
+      return (m_leftEncoder.getPosition() + -m_rightEncoder.getPosition()) / 2.0;
     }
 
     /**
@@ -288,5 +257,47 @@ public class DriveSubsystem extends SubsystemBase {
     public void tankDriveVolts(double leftVolts, double rightVolts) {
         m_leftMotors.setVoltage(leftVolts);
         m_rightMotors.setVoltage(-rightVolts);
+    }
+
+    public void updateSmartDashboard(){
+        SmartRunner.Logger.put("Drivetrain Position", getAverageEncoderDistance(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
+
+        SmartRunner.Logger.getNumber("DrivetrainTurnP", (value) -> {
+            turnController.setP(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnP);
+
+        SmartRunner.Logger.getNumber("DrivetrainTurnI", (value) -> {
+            turnController.setI(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnI);
+
+        SmartRunner.Logger.getNumber("DrivetrainTurnD", (value) -> {
+            turnController.setD(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnD);
+
+        SmartRunner.Logger.getNumber("Draintrain Turn Tolerance", (value) -> {
+            turnController.setTolerance(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.turnTolerance);
+
+        SmartRunner.Logger.put("AutoAim Error", turnController.getPositionError(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
+
+
+        SmartRunner.Logger.getNumber("DrivetrainDistP", (value) -> {
+            distController.setP(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distP);
+
+        SmartRunner.Logger.getNumber("DrivetrainDistI", (value) -> {
+            distController.setI(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distI);
+
+        SmartRunner.Logger.getNumber("DrivetrainDistD", (value) -> {
+            distController.setD(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distD);
+
+        SmartRunner.Logger.getNumber("Draintrain Dist Tolerance", (value) -> {
+            distController.setTolerance(value);
+        }, EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING), DriveConstants.distTolerance);
+
+        SmartRunner.Logger.put("Drivetrain Dist Error", distController.getPositionError(), EnumSet.of(SmartRunner.RunLevel.DRIVETRAIN_TUNING));
+        
     }
 }

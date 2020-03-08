@@ -12,7 +12,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveForward extends CommandBase {
 
-    private double distance = 38;
+    private double distance = 60;
     private DriveSubsystem m_driveSubsystem;
 
     public DriveForward(DriveSubsystem driveSubsystem) {
@@ -23,6 +23,7 @@ public class DriveForward extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        m_driveSubsystem.resetEncoders();
         m_driveSubsystem.setTargetDistance(distance);
         m_driveSubsystem.setRelativeTargetAngle(0);
         m_driveSubsystem.setPIDMode(DriveSubsystem.PIDMode.DIST_WITH_TURN);

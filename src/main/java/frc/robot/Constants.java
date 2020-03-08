@@ -43,7 +43,7 @@ public final class Constants {
     public static final double distP = 0.016;
     public static final double distI = 0.003;
     public static final double distD = 0.00;
-    public static final double distTolerance = 2;
+    public static final double distTolerance = 4;
 
     public static final int[] kLeftEncoderPorts = new int[]{0, 1};
     public static final int[] kRightEncoderPorts = new int[]{2, 3};
@@ -52,11 +52,12 @@ public final class Constants {
 
     public static final int kEncoderCPR = 42;  // NEOs (42), but may use REV Robotics hex shaft encoders (8192 counts per revolution)
     public static final double kWheelDiameterInches = 6;
-    public static final double kMotorToWheelRatio = 5;
-    public static final double kEncoderDistancePerRotation =
-        kMotorToWheelRatio *
+    public static final double kMotorToWheelRatio = 8.25;
+    public static final double kEncoderDistancePerRotation = 
+        (kMotorToWheelRatio *
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterInches * Math.PI);
+        (kWheelDiameterInches * Math.PI)) 
+        / kEncoderCPR;
   }
 
   public static final class ElevatorConstants {
@@ -89,8 +90,8 @@ public final class Constants {
     public static final int kDriverTurnAxis = 2;
     public static final int kDriverSpeedAxis = 3;
 
-    public static final double kmaxTurnMultiplier = .8;
-    public static final double kminTurnMultiplier = .55;
+    public static final double kmaxTurnMultiplier = .6;
+    public static final double kminTurnMultiplier = .35;
 
     public static final int kOperatorControllerPort = 1;
 

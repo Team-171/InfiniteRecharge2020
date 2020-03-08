@@ -74,6 +74,7 @@ public class RobotContainer {
     public RobotContainer() {
         // Configure the button bindings
         configureButtonBindings();
+        configureChooser();
 
         m_driveSubsystem.setDefaultCommand(
             // A split-stick arcade command, with forward/backward controlled by the left
@@ -146,6 +147,7 @@ public class RobotContainer {
     public void configureChooser(){
         autoChooser.setDefaultOption("Simple Drive Forward", new AutoDriveForward(m_driveSubsystem));
         autoChooser.addOption("Drive Forward and Shoot", new DriveForwardAndShoot(m_driveSubsystem, m_shooterSubsystem, m_shintakeSubsystem));
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     /**
